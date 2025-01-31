@@ -1,15 +1,16 @@
 #imports
 import random
 import time
+import os
 #variables
 deck = []
 playerHand = []
+playersPrint = []
 playerBalance = 500
 currBet = 0
 playerBet = 0
 opps = []
 action = ""
-playing = True
 currOpps = []
 board = []
 pot = 0
@@ -28,13 +29,28 @@ class opponent:
         self.type = random.choice([0, 1, 2, 3])
         self.betRn = 0
         self.action = ""
+        self.handRevealed = False
+    def reset(self):
+        self.hand = []
+        self.betRn = 0
+        self.action = ""
+        self.handRevealed = False
     def getnumAI(self):
         return self.numOpp
+    def __str__(self):
+        if self.betRn > 0:
+            if self.handRevealed: return self.getNameAndBalance() + f" ({self.betRn}) " + " ".join(self.hand)
+            return self.getNameAndBalance() + f" ({self.betRn})"
+        if self.handRevealed: return self.getNameAndBalance() + " ".join(self.hand)
+        return self.getNameAndBalance()
     def getNameAndBalance(self):
         return self.name + f" ({self.balance})"
     def dealHand(self, deck):
         self.hand.append(deck.pop())
         self.hand.append(deck.pop())
+    def revealHand(self):
+        self.handRevealed = True
+        return f"{self.name} has {self.hand[0]} {self.hand[1]}" 
     def getHand(self):
         return self.hand
     def getType(self):
@@ -49,8 +65,11 @@ class opponent:
         return self.action
     def addBalance(self, winnings):
         self.balance += winnings
-        print(self.name, "wins!")
+        print(self.name, f"wins a pot of {winnings} with a {calcHand(self.hand)[0]}! They now have {self.balance}.")
+    def removeBalance(self, losings):
+        self.balance -= losings
     def bet(self, currBet):
+        #return self.setBetAndAction(["call", currBet])
         chance = 5
         rating = rateHand(self.getHand())
         fear = currBet / self.getBalance()
@@ -69,26 +88,26 @@ class opponent:
         choice = random.randint(0, chance) > 1
         if rating > 20:
             if choice: self.setBetAndAction(["call", currBet])
-            elif self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // random.randint(6, chance+6))])
+            elif self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // 3 // random.randint(6, chance+6))])
             else: self.setBetAndAction(["fold", self.betRn])
         elif rating < 5:
             if choice: self.setBetAndAction(["fold", 0])
             elif random.randint(0, chance) > 0: self.setBetAndAction(["call", currBet])
-            elif self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // (4*random.randint(6, chance+6)))])
+            elif self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // 6 // (4*random.randint(6, chance+6)))])
             else: self.setBetAndAction(["fold", self.betRn])
         else:
             if fear > 1:
                 if choice: self.setBetAndAction(["fold", 0])
                 elif random.randint(0, chance) > 0: self.setBetAndAction(["call", currBet])
-                elif self.balance > currBet: self.setBetAndAction(["raise", (self.getBalance() // (4*random.randint(6, chance+6)))])
+                elif self.balance > currBet: self.setBetAndAction(["raise", (self.getBalance() // 6 // (4*random.randint(6, chance+6)))])
                 else: self.setBetAndAction(["fold", self.betRn])
             elif fear < 0.1:
                 if choice: self.setBetAndAction(["call", currBet])
-                elif random.randint(0, chance) > 0 and self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // (2*random.randint(6, chance+6)))])
+                elif random.randint(0, chance) > 0 and self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // 4 // (2*random.randint(6, chance+6)))])
                 else: self.setBetAndAction(["fold", self.betRn])
             else:
                 if choice: self.setBetAndAction(["call", currBet])
-                elif random.randint(0, chance) > 0 and self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // (2*random.randint(6, chance+6)))])
+                elif random.randint(0, chance) > 0 and self.balance > currBet: self.setBetAndAction(["raise", currBet + (self.getBalance() // 4 // (2*random.randint(6, chance+6)))])
                 else: self.setBetAndAction(["fold", self.betRn])
     def setBetAndAction(self, actions):
         self.action = actions[0]
@@ -98,6 +117,14 @@ class opponent:
             return self.getNameAndBalance() + " raises to " + str(self.betRn) + "!"
         if self.action == "call": return self.getNameAndBalance() + " calls for " + str(self.betRn) + "!"
         return self.getNameAndBalance() + " folds!"
+
+def clear_screen():
+    # For Windows
+    if os.name == 'nt':
+        _ = os.system('cls')
+    # For macOS and Linux
+    else:
+        _ = os.system('clear')
 
 def makeDeck():
     deck = []
@@ -135,20 +162,20 @@ def river():
 def whoWins():
     global currOpps, playerHand, playing
     theHands = []
-    if playing: theHands.append(playerHand)
+    if playing: theHands.append(calcHand(playerHand))
+    print(theHands)
+    input()
     bestHand = ["high card", 2]
     for i in currOpps:
-        print("this player's best hand is ", calcHand(i.getHand()))
         theHands.append(calcHand(i.getHand()))
     for i in theHands:
-        print(i)
         bestHand = rateHandonBoard(i, bestHand)
-    print(bestHand)
     for i in currOpps:
         if bestHand == calcHand(i.getHand()):
             return i
+    return False
 
-def calcHand(hand):
+def calcHand(hand): #probably need to rewrite this because it doesn't work well with ties, should figure out best 5 cards from 7 and go from there
     global board
     totalBoard = []
     for i in board: totalBoard.append(i)
@@ -164,8 +191,6 @@ def calcHand(hand):
     for i in totalBoard: 
         numsInBoard.append(numsDict[i[0]])
         suitsInBoard.append(i[1])
-    print(totalBoard)
-    print(numsInBoard)
     for i in nums:
         if numsInBoard.count(i) == 2: handMine.append(["pair", i])
         elif numsInBoard.count(i) == 3: handMine.append(["three of a kind", i])
@@ -178,13 +203,18 @@ def calcHand(hand):
             if n in numsInBoard:
                 straightC += 1
                 x = n
-        if straightC == 5: handMine.append(["straight", x]) #straight doesn't work
+        if straightC == 5: handMine.append(["straight", x]) #straight doesn't work fixed now maybe?
     for i in suits:
         if suitsInBoard.count(i) >= 5: handMine.append(["flush", i])
+    if handMine:
+        check = []
+        for i in handMine: check.append(i[0])
+        if "three of a kind" in check and "pair" in check: handMine.append(["full house", 5]) #5 is a placeholder
+        if check.count("pair") >= 2: handMine.append(["two pair", 5])
     if not handMine:
         best = 0
         for i in numsInBoard:
-            if i > best: i = best
+            if i > best: best = i
         handMine.append(["high card", best])
     bestHand = ["high card", 2]
     for i in handMine:
@@ -207,13 +237,9 @@ def rateHandonBoard(hand1, hand2):
     else: return hand1 #change to allow ties
 
 def playerBetting():
-    global action
-    global playerBet
-    global currBet
-    global playerHand
-    global playerBalance
-    global pot
+    global action, playerBet, currBet, playerHand, playerBalance, pot, currOpps
     while True:
+        printPlayers()
         print(playerHand)
         action = input("Press R to raise, C to check/call, or F to fold.")
         while action != "R" and action != "C" and action != "F":
@@ -237,6 +263,7 @@ def playerBetting():
     pot += playerBet
 
 def playerRaise():
+    global playerBalance
     bet = input(f"You have ${playerBalance}. How much would you like to raise?")
     if isInt(bet):
         if not bet == "0":
@@ -269,94 +296,160 @@ def rateHand(hand):
     elif cards.index(hand[0][0]) - 3 == cards.index(hand[1][0]): rating += 2
     return rating
 
+def printPlayers():
+    clear_screen()
+    global playersPrint, board, pot, currBet, playerHand
+    for i in playersPrint: print(i)
+    if board: print("BOARD: ", board)
+    else: print("BOARD is empty")
+    print("POT: ", pot)
+    print("CURRENT BET: ", currBet)
+    print("YOUR HAND: ", playerHand)
+    time.sleep(0.1)
+
 def roundOfBetting():
-    global currBet
-    global action
-    global currOpps
-    global playerBet
-    global pot
-    global gameOn
-    global winner
-    global playing
-    playerBetting()
-    if action == "F": playing = False
-    for i in currOpps:
-        i.bet(currBet)
-        if i.getBet() > currBet: currBet = i.getBet()
-        if i.getAction() == "fold": 
-            pot += i.getBet()
-            currOpps.pop(currOpps.index(i))
-        print(i.actionToString(), i.getHand())
+    global currBet, action, currOpps, opps, playerBet, pot, gameOn, winner, playing
+    if playing:
+        playerBetting()
+        if action == "F": playing = False
+    for i in opps:
+        if i in currOpps:
+            i.bet(currBet)
+            if i.getBet() > currBet: currBet = i.getBet()
+            playersPrint[currOpps.index(i)] = (i.actionToString(), i.getHand())
+            printPlayers()
+            if i.getAction() == "fold": 
+                pot += i.getBet()
+                currOpps.pop(currOpps.index(i))
+            resetPlayersPrint()
     while True:
         checkBets = 0
         for r in currOpps:
             if r.getBet() != currBet: checkBets = 1
-            if playerBet != currBet: checkBets = 1
+            if playing: 
+                if playerBet != currBet: checkBets = 1
         if checkBets == 0: break
         if playing:
             playerBetting()
             if action == "F": playing = False
-        for i in currOpps:
+        for i in opps:
             checkBets = 0
             for r in currOpps:
                 if r.getBet() != currBet: checkBets = 1
-            if playerBet != currBet: checkBets = 1
+            if playing:
+                if playerBet != currBet: checkBets = 1
             if checkBets == 0: break
-            i.bet(currBet)
-            if i.getBet() > currBet: currBet = i.getBet()
-            if i.getAction() == "fold": 
-                pot += i.getBet()
-                currOpps.pop(currOpps.index(i))
-            print(i.actionToString(), i.getHand())
+            if i in currOpps:
+                i.bet(currBet)
+                if i.getBet() > currBet: currBet = i.getBet()
+                playersPrint[currOpps.index(i)] = (i.actionToString(), i.getHand())
+                printPlayers()
+                if i.getAction() == "fold": 
+                    pot += i.getBet()
+                    currOpps.pop(currOpps.index(i))
+                resetPlayersPrint()
+                #printPlayers()
         checkBets = 0
         if len(currOpps) == 0:
             gameOn = False
             winner = False
+            break
         elif len(currOpps) == 1 and playing == False:
             gameOn = False
             winner = currOpps[0]
+            break
         for r in currOpps:
             if r.getBet() != currBet: checkBets = 1
-        if playerBet != currBet: checkBets = 1
+        if playing:
+            if playerBet != currBet: checkBets = 1
         if checkBets == 0: break
 
-deck = makeDeck()
-playerHand.append(deck.pop())
-playerHand.append(deck.pop())
+def resetPlayersPrint():
+    global playersPrint
+    global currOpps
+    playersPrint = []
+    for i in currOpps:
+        playersPrint.append(str(i))
+
+def resetBets():
+    global currOpps, gameOn, winner, playerBalance, pot, currBet
+    for i in currOpps:
+        pot += i.getBet()
+        i.removeBalance(i.getBet())
+        i.setBetAndAction(["call", 0])
+    if not gameOn:
+        if not winner:
+            playerBalance += pot
+        else:
+            i.addBalance(pot)
+    currBet = 0
+
+def round():
+    global currOpps, deck, playerHand, pot, playerBalance, currBet, playerBet, action, board, gameOn, playing, playersPrint
+    deck = []
+    playerHand = []
+    playersPrint = []
+    playerBalance = 500
+    currBet = 0
+    playerBet = 0
+    action = ""
+    currOpps = []
+    board = []
+    pot = 0
+    gameOn = True
+    playing = True
+    deck = makeDeck()
+    playerHand.append(deck.pop())
+    playerHand.append(deck.pop())
+    for i in opps:
+        i.reset()
+        i.dealHand(deck)
+        currOpps.append(i)
+
+    resetPlayersPrint()
+
+    roundOfBetting()
+
+    resetBets()
+
+    resetPlayersPrint()
+        
+    flop()
+
+    roundOfBetting()
+
+    resetBets()
+
+    resetPlayersPrint()
+
+    turn()
+
+    roundOfBetting()
+
+    resetBets()
+
+    resetPlayersPrint()
+
+    river()
+
+    roundOfBetting()
+
+    resetBets()
+
+    resetPlayersPrint()
+
+    for i in currOpps:
+        playersPrint[currOpps.index(i)] = i.revealHand()
+        printPlayers()
+        resetPlayersPrint()
+
+    winner = whoWins()
+    if winner: winner.addBalance(pot)
+    else: 
+        playerBalance += pot
+        print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
+    input()
+
 for i in range(7):
     opps.append(opponent(i))
-    opps[i].dealHand(deck)
-currOpps = opps
-
-roundOfBetting()
-for i in currOpps:
-    pot += i.getBet()
-    i.setBetAndAction(["call", 0])
-if not gameOn:
-    if not winner:
-        playerBalance += pot
-    else:
-        i.addBalance(pot)
-currBet = 0
-flop()
-
-roundOfBetting()
-for i in currOpps:
-    pot += i.getBet()
-    i.setBetAndAction(["call", 0])
-if not gameOn:
-    if not winner:
-        playerBalance += pot
-    else:
-        i.addBalance(pot)
-currBet = 0
-turn()
-
-roundOfBetting()
-
-river()
-
-roundOfBetting()
-
-winner = whoWins()
-winner.addBalance(pot)
+while playerBalance > 0: round()
