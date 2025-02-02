@@ -69,7 +69,8 @@ class opponent:
     def removeBalance(self, losings):
         self.balance -= losings
     def bet(self, currBet):
-        #return self.setBetAndAction(["call", currBet])
+        self.setBetAndAction(["call", currBet])
+        return
         chance = 5
         rating = rateHand(self.getHand())
         fear = currBet / self.getBalance()
@@ -138,7 +139,10 @@ def makeDeck():
 def flop():
     global board
     global deck
-    for i in [0, 1, 2]: board.append(deck.pop())
+    #for i in [0, 1, 2]: board.append(deck.pop())
+    board.append("2♣")
+    board.append("3♣")
+    board.append("4♣")
     print("Flop!")
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2])
@@ -146,7 +150,8 @@ def flop():
 def turn():
     global board
     global deck
-    board.append(deck.pop())
+    #board.append(deck.pop())
+    board.append("5♣")
     print("Turn!")
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2], board[3])
@@ -154,38 +159,101 @@ def turn():
 def river():
     global board
     global deck
-    board.append(deck.pop())
+    #board.append(deck.pop())
+    board.append("6♣")
     print("River!")
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2], board[3], board[4])
 
 def whoWins():
     global currOpps, playerHand, playing
-    theHands = []
-    if playing: theHands.append(calcHand(playerHand))
-    print(theHands)
     input()
-    bestHand = ["high card", 2]
+    winners = [False]
+    if playing:
+        bestHand = playerHand
+    else:
+        bestHand = False
     for i in currOpps:
-        theHands.append(calcHand(i.getHand()))
-    for i in theHands:
-        bestHand = rateHandonBoard(i, bestHand)
-    for i in currOpps:
-        if bestHand == calcHand(i.getHand()):
-            return i
+        if handVsHand(i.getHand(), bestHand):
+            if not handVsHand(i.getHand(), bestHand):
+                winners.append(i)
+            else: 
+                bestHand = handVsHand(i.getHand(), bestHand)
+                if i.getHand() == bestHand: winners = [i]
+    if winners[0] or len(winners) > 1: return winners
     return False
+
+def handVsHand(hand1, hand2):
+    global board
+    if not hand2: return hand1
+    numsDict = {"2" : 2, "3" : 3, "4" : 4, "5" : 5, "6" : 6, "7" : 7, "8" : 8, "9" : 9, "T" : 10, "J" : 11, "Q" : 12, "K" : 13, "A" : 14}
+    if rateHandonBoard(calcHand(hand1), calcHand(hand2)): return rateHandonBoard(calcHand(hand1), calcHand(hand2))
+    fullHand1 = hand1.copy()
+    fullHand2 = hand2.copy()
+    for i in board:
+        fullHand1.append(i)
+        fullHand2.append(i)
+    while len(fullHand1) > 2:
+        numsInFullHand1 = []
+        numsInFullHand2 = []
+        for i in fullHand1: 
+            numsInFullHand1.append(numsDict[i[0]])
+        for i in fullHand2:
+            numsInFullHand2.append(numsDict[i[0]])
+        tiedHand = calcHand(hand1)
+        if tiedHand[0] == "high card":
+            fullHand1.pop(numsInFullHand1.find(tiedHand[1]))
+            fullHand2.pop(numsInFullHand2.find(tiedHand[1]))
+        elif tiedHand[0] == "pair":
+            for i in [0, 1]:
+                fullHand1.pop(numsInFullHand1.find(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.find(tiedHand[1]))
+        elif tiedHand[0] == "two pair":
+            for i in [0, 1]:
+                fullHand1.pop(numsInFullHand1.find(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.find(tiedHand[1]))
+        elif tiedHand[0] == "three of a kind":
+            for i in [0, 1, 2]:
+                fullHand1.pop(numsInFullHand1.find(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.find(tiedHand[1]))
+        elif tiedHand[0] == "full house":
+            for i in [0, 1, 2]:
+                fullHand1.pop(numsInFullHand1.find(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.find(tiedHand[1]))
+        elif tiedHand[0] == "four of a kind":
+            for i in [0, 1, 2, 3]:
+                fullHand1.pop(numsInFullHand1.find(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.find(tiedHand[1]))
+        elif tiedHand[0] == "flush":
+            fullHand1[0] = fullHand1[0][0] + "♠"
+            fullHand2[0] = fullHand2[0][0] + "♠"
+            fullHand1[1] = fullHand1[0][0] + "♥"
+            fullHand2[1] = fullHand2[0][0] + "♥"
+            fullHand1[2] = fullHand1[0][0] + "♦"
+            fullHand2[2] = fullHand2[0][0] + "♦"
+            fullHand1[3] = fullHand1[0][0] + "♣"
+            fullHand2[3] = fullHand1[0][0] + "♣"
+        elif tiedHand[0] == "straight" or tiedHand[0] == "straight flush" or tiedHand[0] == "royal flush":
+            return False
+        if rateHandonBoard(calcHand(hand1), calcHand(hand2)): return rateHandonBoard(calcHand(hand1), calcHand(hand2))
+    return False
+    
+
 
 def calcHand(hand): #probably need to rewrite this because it doesn't work well with ties, should figure out best 5 cards from 7 and go from there
     global board
-    totalBoard = []
-    for i in board: totalBoard.append(i)
+    if len(hand) == 2:
+        totalBoard = []
+        for i in board: totalBoard.append(i)
+        for i in hand: totalBoard.append(i)
+    else:
+        totalBoard = hand.copy()
     handMine = []
     nums = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     suits = ["♠", "♥", "♦", "♣"]
     numsDict = {"2" : 2, "3" : 3, "4" : 4, "5" : 5, "6" : 6, "7" : 7, "8" : 8, "9" : 9, "T" : 10, "J" : 11, "Q" : 12, "K" : 13, "A" : 14}
     handsDict = {"high card" : 0, "pair" : 1, "two pair" : 2, "three of a kind" : 3, "straight" : 4, "flush" : 5, "full house" : 6, "four of a kind" : 7, "straight flush" : 8, "royal flush" : 9}
     
-    for i in hand: totalBoard.append(i)
     numsInBoard = []
     suitsInBoard = []
     for i in totalBoard: 
@@ -199,18 +267,28 @@ def calcHand(hand): #probably need to rewrite this because it doesn't work well 
     for i in numsInBoard:
         straightC = 0
         x = 0
+        rightSuit = ["unassigned", 0]
         for n in range(i, i+5):
             if n in numsInBoard:
                 straightC += 1
                 x = n
-        if straightC == 5: handMine.append(["straight", x]) #straight doesn't work fixed now maybe?
+                if rightSuit[0] == "unnasigned" or rightSuit[0] == suitsInBoard[numsInBoard.index(n)]: 
+                    rightSuit[0] = suitsInBoard[numsInBoard.index(n)]
+                    rightSuit[1] += 1
+        if straightC == 5 and rightSuit[1] == 5 and x == 14: handMine.append(["royal flush", x])
+        elif straightC == 5 and rightSuit[1] == 5: handMine.append(["straight flush", x])
+        elif straightC == 5: handMine.append(["straight", x])
     for i in suits:
         if suitsInBoard.count(i) >= 5: handMine.append(["flush", i])
     if handMine:
         check = []
         for i in handMine: check.append(i[0])
-        if "three of a kind" in check and "pair" in check: handMine.append(["full house", 5]) #5 is a placeholder
-        if check.count("pair") >= 2: handMine.append(["two pair", 5])
+        if "three of a kind" in check and "pair" in check: handMine.append(["full house", handMine[check.index("three of a kind")][1]])
+        if check.count("pair") >= 2:
+            if handMine[check.index("pair")][1] > handMine[check.index("pair", check.index("pair")+1)][1]:
+                handMine.append(["two pair", handMine[check.index("pair")][1]])
+            else:
+                handMine.append(["two pair", handMine[check.index("pair", check.index("pair")+1)][1]])
     if not handMine:
         best = 0
         for i in numsInBoard:
@@ -233,8 +311,8 @@ def rateHandonBoard(hand1, hand2):
     elif hand1[0] != "flush":
         if hand1[1] > hand2[1]: return hand1
         elif hand2[1] > hand1[1]: return hand2
-        else: return hand1 #change to allow ties
-    else: return hand1 #change to allow ties
+        else: return False
+    else: return False
 
 def playerBetting():
     global action, playerBet, currBet, playerHand, playerBalance, pot, currOpps
@@ -298,13 +376,14 @@ def rateHand(hand):
 
 def printPlayers():
     clear_screen()
-    global playersPrint, board, pot, currBet, playerHand
+    global playersPrint, board, pot, currBet, playerHand, playerBalance
     for i in playersPrint: print(i)
     if board: print("BOARD: ", board)
     else: print("BOARD is empty")
     print("POT: ", pot)
     print("CURRENT BET: ", currBet)
     print("YOUR HAND: ", playerHand)
+    print("YOUR BALANCE: ", playerBalance)
     time.sleep(0.1)
 
 def roundOfBetting():
@@ -348,7 +427,6 @@ def roundOfBetting():
                     pot += i.getBet()
                     currOpps.pop(currOpps.index(i))
                 resetPlayersPrint()
-                #printPlayers()
         checkBets = 0
         if len(currOpps) == 0:
             gameOn = False
@@ -444,7 +522,15 @@ def round():
         resetPlayersPrint()
 
     winner = whoWins()
-    if winner: winner.addBalance(pot)
+    pot = pot // len(winner)
+    if len(winner) > 1:
+        print("There is a split pot because of a tie!")
+        for i in winner:
+            if i:
+                i.addBalance(pot)
+            else: 
+                playerBalance += pot
+                print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
     else: 
         playerBalance += pot
         print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
