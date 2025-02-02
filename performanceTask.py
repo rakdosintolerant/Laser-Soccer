@@ -19,6 +19,8 @@ playing = True
 winner = 1
 names = ["Bernie Sanders", "Winston Churchill", "Cheickna Traore", "Joe Rogan", "XXXTentacion", "Player 456", "Seong Gi-Hun", "James Charles", "Elon Musk", "El Kuhn", "Lil Colfax", "Pink Floyd", "John Wilkes Boothe", "John Locke", "Yeezy", "Haley Welch", "Mahatma Ghandi", "Mike Tyson", "Donald Trump", "Joe Biden", "Kamala Harris", "Ben Shapiro", "Barack Obama", "Omar Hussaini", "Peter Hum", "Luh Cas", "George Washington", "Stevie Wonder", "Michael Jackson", "Drake", "Kanye West", "Anthony Fauci", "Dream", "Ninja w/out a low taper fade", "Ninja w/ a low taper fade", "Chopped Chin", "I bought a property in Egypt", "Patrick Sasser", "Rosa Parks", "Lizzo", "Martin Luther King Jr.", "Frank Sinatra", "Logan Paul and Jake Paul", "Kendrick L. Duckworth", "Kurt Cobain", "OJ Simpson", "Courtney Love", "Patrick Mahomes", "The Denver Broncos", "Michelle Obama", "Pennywise the Clown", "DJ Khaled"]
 #classes and functions
+
+#opponent stuff is all stored here, we should make it its own file
 class opponent:
     def __init__(self, numOpp):
         self.name = random.choice(names)
@@ -30,6 +32,9 @@ class opponent:
         self.betRn = 0
         self.action = ""
         self.handRevealed = False
+
+    #a bunch of getters and basic functions
+
     def reset(self):
         self.hand = []
         self.betRn = 0
@@ -43,6 +48,7 @@ class opponent:
             return self.getNameAndBalance() + f" ({self.betRn})"
         if self.handRevealed: return self.getNameAndBalance() + " ".join(self.hand)
         return self.getNameAndBalance()
+    
     def getNameAndBalance(self):
         return self.name + f" ({self.balance})"
     def dealHand(self, deck):
@@ -68,6 +74,8 @@ class opponent:
         print(self.name, f"wins a pot of {winnings} with a {calcHand(self.hand)[0]}! They now have {self.balance}.")
     def removeBalance(self, losings):
         self.balance -= losings
+
+    #needs work but its the idea for how computer decides to bet. Right now they raise too often and need to consider the board
     def bet(self, currBet):
         #return self.setBetAndAction(["call", currBet])
         chance = 5
@@ -117,6 +125,8 @@ class opponent:
             return self.getNameAndBalance() + " raises to " + str(self.betRn) + "!"
         if self.action == "call": return self.getNameAndBalance() + " calls for " + str(self.betRn) + "!"
         return self.getNameAndBalance() + " folds!"
+    
+#basic easy functions
 
 def clear_screen():
     # For Windows
@@ -159,6 +169,8 @@ def river():
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2], board[3], board[4])
 
+
+#this sort of works but doesn't account for ties
 def whoWins():
     global currOpps, playerHand, playing
     theHands = []
@@ -176,7 +188,7 @@ def whoWins():
     return False
 
 def calcHand(hand): #probably need to rewrite this because it doesn't work well with ties, should figure out best 5 cards from 7 and go from there
-    global board
+    global board #my attempt at it is in the other branch
     totalBoard = []
     for i in board: totalBoard.append(i)
     handMine = []
@@ -223,6 +235,8 @@ def calcHand(hand): #probably need to rewrite this because it doesn't work well 
         elif handsDict[i[0]] == handsDict[bestHand[0]] and i[0] != "flush" and i[1] > bestHand[1]: bestHand = i
     return bestHand
 
+
+#comparing two hands based on calcHand()
 def rateHandonBoard(hand1, hand2):
     handsDict = {"high card" : 0, "pair" : 1, "two pair" : 2, "three of a kind" : 3, "straight" : 4, "flush" : 5, "full house" : 6, "four of a kind" : 7, "straight flush" : 8, "royal flush" : 9}
 
@@ -236,6 +250,8 @@ def rateHandonBoard(hand1, hand2):
         else: return hand1 #change to allow ties
     else: return hand1 #change to allow ties
 
+
+#the sequence that lets the player bet
 def playerBetting():
     global action, playerBet, currBet, playerHand, playerBalance, pot, currOpps
     while True:
@@ -262,6 +278,8 @@ def playerBetting():
     playerBalance -= playerBet
     pot += playerBet
 
+
+#to make sure the player raises a legal amount
 def playerRaise():
     global playerBalance
     bet = input(f"You have ${playerBalance}. How much would you like to raise?")
@@ -281,6 +299,7 @@ def isInt(num):
         return True
     except ValueError: return False
 
+#this is for the opponent betting
 def rateHand(hand):
     cards = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
     rating = 0
@@ -296,6 +315,7 @@ def rateHand(hand):
     elif cards.index(hand[0][0]) - 3 == cards.index(hand[1][0]): rating += 2
     return rating
 
+#should be deprecated when we move to pygame
 def printPlayers():
     clear_screen()
     global playersPrint, board, pot, currBet, playerHand
@@ -307,22 +327,24 @@ def printPlayers():
     print("YOUR HAND: ", playerHand)
     time.sleep(0.1)
 
+#where all of the opponents make their decisions. This is probably what you will need
+#to look at the most because it's where the frontend needs to be updated.
 def roundOfBetting():
     global currBet, action, currOpps, opps, playerBet, pot, gameOn, winner, playing
     if playing:
-        playerBetting()
+        playerBetting() #player always bets first right now
         if action == "F": playing = False
     for i in opps:
         if i in currOpps:
             i.bet(currBet)
             if i.getBet() > currBet: currBet = i.getBet()
             playersPrint[currOpps.index(i)] = (i.actionToString(), i.getHand())
-            printPlayers()
+            printPlayers() #this is where the UI updates in terminal
             if i.getAction() == "fold": 
                 pot += i.getBet()
                 currOpps.pop(currOpps.index(i))
             resetPlayersPrint()
-    while True:
+    while True: #this keeps running until everyone calls or folds
         checkBets = 0
         for r in currOpps:
             if r.getBet() != currBet: checkBets = 1
@@ -349,6 +371,8 @@ def roundOfBetting():
                     currOpps.pop(currOpps.index(i))
                 resetPlayersPrint()
                 #printPlayers()
+
+        #makes sure everyone has the same bet
         checkBets = 0
         if len(currOpps) == 0:
             gameOn = False
@@ -371,6 +395,7 @@ def resetPlayersPrint():
     for i in currOpps:
         playersPrint.append(str(i))
 
+#resets the round
 def resetBets():
     global currOpps, gameOn, winner, playerBalance, pot, currBet
     for i in currOpps:
@@ -385,6 +410,7 @@ def resetBets():
     currBet = 0
 
 def round():
+    #this is called to initiate each round
     global currOpps, deck, playerHand, pot, playerBalance, currBet, playerBet, action, board, gameOn, playing, playersPrint
     deck = []
     playerHand = []
@@ -450,6 +476,7 @@ def round():
         print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
     input()
 
+#the initialization code that starts the file
 for i in range(7):
     opps.append(opponent(i))
 while playerBalance > 0: round()
