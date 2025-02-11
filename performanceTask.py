@@ -175,18 +175,19 @@ def whoWins():
     else:
         bestHand = False
     for i in currOpps:
-        if handVsHand(i.getHand(), bestHand):
-            if not handVsHand(i.getHand(), bestHand):
-                winners.append(i)
-            else: 
-                bestHand = handVsHand(i.getHand(), bestHand)
-                if i.getHand() == bestHand: winners = [i]
+        print(handVsHand(i.getHand(), bestHand))
+        if not handVsHand(i.getHand(), bestHand):
+            winners.append(i)
+        else: 
+            bestHand = handVsHand(i.getHand(), bestHand)
+            if i.getHand() == bestHand: winners = [i]
     if (winners[0]) or (len(winners) > 1): return winners
     return False
 
 def handVsHand(hand1, hand2):
     global board
     if not hand2: return hand1
+    print("hand 1,", hand1, "hand 2,", hand2)
     numsDict = {"2" : 2, "3" : 3, "4" : 4, "5" : 5, "6" : 6, "7" : 7, "8" : 8, "9" : 9, "T" : 10, "J" : 11, "Q" : 12, "K" : 13, "A" : 14}
     if rateHandonBoard(calcHand(hand1), calcHand(hand2)): return rateHandonBoard(calcHand(hand1), calcHand(hand2))
     fullHand1 = hand1.copy()
@@ -203,28 +204,28 @@ def handVsHand(hand1, hand2):
             numsInFullHand2.append(numsDict[i[0]])
         tiedHand = calcHand(hand1)
         if tiedHand[0] == "high card":
-            fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
-            fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
+            fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
+            fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
         elif tiedHand[0] == "pair":
             for i in [0, 1]:
-                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
-                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
+                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
         elif tiedHand[0] == "two pair":
             for i in [0, 1]:
-                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
-                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
+                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
         elif tiedHand[0] == "three of a kind":
             for i in [0, 1, 2]:
-                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
-                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
+                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
         elif tiedHand[0] == "full house":
             for i in [0, 1, 2]:
-                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
-                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
+                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
         elif tiedHand[0] == "four of a kind":
             for i in [0, 1, 2, 3]:
-                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
-                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
+                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
         elif tiedHand[0] == "flush":
             fullHand1[0] = fullHand1[0][0] + "♠"
             fullHand2[0] = fullHand2[0][0] + "♠"
@@ -236,7 +237,9 @@ def handVsHand(hand1, hand2):
             fullHand2[3] = fullHand1[0][0] + "♣"
         elif tiedHand[0] == "straight" or tiedHand[0] == "straight flush" or tiedHand[0] == "royal flush":
             return False
-        if rateHandonBoard(calcHand(hand1), calcHand(hand2)): return rateHandonBoard(calcHand(hand1), calcHand(hand2))
+        if rateHandonBoard(calcHand(hand1), calcHand(hand2)): 
+            if rateHandonBoard(calcHand(hand1), calcHand(hand2)) == calcHand(hand1): return hand1
+            return hand2
     return False
     
 
@@ -247,8 +250,10 @@ def calcHand(hand):
         totalBoard = []
         for i in board: totalBoard.append(i)
         for i in hand: totalBoard.append(i)
+        print("len was 2")
     else:
         totalBoard = hand.copy()
+        print("was copiued")
     print(totalBoard)
     handMine = []
     nums = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
