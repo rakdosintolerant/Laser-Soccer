@@ -17,7 +17,7 @@ pot = 0
 gameOn = True
 playing = True
 winner = 1
-names = ["Bernie Sanders", "Winston Churchill", "Cheickna Traore", "Joe Rogan", "XXXTentacion", "Player 456", "Seong Gi-Hun", "James Charles", "Elon Musk", "El Kuhn", "Lil Colfax", "Pink Floyd", "John Wilkes Boothe", "John Locke", "Yeezy", "Haley Welch", "Mahatma Ghandi", "Mike Tyson", "Donald Trump", "Joe Biden", "Kamala Harris", "Ben Shapiro", "Barack Obama", "Omar Hussaini", "Peter Hum", "Luh Cas", "George Washington", "Stevie Wonder", "Michael Jackson", "Drake", "Kanye West", "Anthony Fauci", "Dream", "Ninja w/out a low taper fade", "Ninja w/ a low taper fade", "Chopped Chin", "I bought a property in Egypt", "Patrick Sasser", "Rosa Parks", "Lizzo", "Martin Luther King Jr.", "Frank Sinatra", "Logan Paul and Jake Paul", "Kendrick L. Duckworth", "Kurt Cobain", "OJ Simpson", "Courtney Love", "Patrick Mahomes", "The Denver Broncos", "Michelle Obama", "Pennywise the Clown", "DJ Khaled"]
+names = ["Bernie Sanders", "Winston Churchill", "What's a Father", "Cheickna Traore", "Joe Rogan", "XXXTentacion", "Player 456", "Seong Gi-Hun", "James Charles", "Elon Musk", "El Kuhn", "Lil Colfax", "Pink Floyd", "John Wilkes Boothe", "John Locke", "Yeezy", "Haley Welch", "Mahatma Ghandi", "Mike Tyson", "Donald Trump", "Joe Biden", "Kamala Harris", "Ben Shapiro", "Barack Obama", "Omar Hussaini", "Peter Hum", "Luh Cas", "George Washington", "Stevie Wonder", "Michael Jackson", "Drake", "Kanye West", "Anthony Fauci", "Dream", "Ninja w/out a low taper fade", "Ninja w/ a low taper fade", "Chopped Chin", "I bought a property in Egypt", "Patrick Sasser", "Rosa Parks", "Lizzo", "Martin Luther King Jr.", "Frank Sinatra", "Logan Paul and Jake Paul", "Kendrick L. Duckworth", "Kurt Cobain", "OJ Simpson", "Courtney Love", "Patrick Mahomes", "The Denver Broncos", "Michelle Obama", "Pennywise the Clown", "DJ Khaled"]
 #classes and functions
 class opponent:
     def __init__(self, numOpp):
@@ -169,13 +169,14 @@ def river():
 def whoWins():
     global currOpps, playerHand, playing
     input()
-    winners = [False]
+    winners = [False, False]
+    winners.pop()
     if playing:
         bestHand = playerHand
     else:
         bestHand = False
     for i in currOpps:
-        print(handVsHand(i.getHand(), bestHand))
+        print("the handvshand is ", handVsHand(i.getHand(), bestHand))
         if not handVsHand(i.getHand(), bestHand):
             winners.append(i)
         else: 
@@ -189,7 +190,10 @@ def handVsHand(hand1, hand2):
     if not hand2: return hand1
     print("hand 1,", hand1, "hand 2,", hand2)
     numsDict = {"2" : 2, "3" : 3, "4" : 4, "5" : 5, "6" : 6, "7" : 7, "8" : 8, "9" : 9, "T" : 10, "J" : 11, "Q" : 12, "K" : 13, "A" : 14}
-    if rateHandonBoard(calcHand(hand1), calcHand(hand2)): return rateHandonBoard(calcHand(hand1), calcHand(hand2))
+    numsDict2 = {2 : "2", 3 : "3", 4 : "4", 5 : "5", 6 : "6", 7 : "7", 8 : "8", 9 : "9", 10 : "T", 11 : "J", 12 : "Q", 13 : "K", 14 : "A"}
+    if rateHandonBoard(calcHand(hand1), calcHand(hand2)): 
+            if rateHandonBoard(calcHand(hand1), calcHand(hand2)) == calcHand(hand1): return hand1
+            return hand2
     fullHand1 = hand1.copy()
     fullHand2 = hand2.copy()
     for i in board:
@@ -204,28 +208,28 @@ def handVsHand(hand1, hand2):
             numsInFullHand2.append(numsDict[i[0]])
         tiedHand = calcHand(hand1)
         if tiedHand[0] == "high card":
-            fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
-            fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
+            fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
+            fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
         elif tiedHand[0] == "pair":
             for i in [0, 1]:
-                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
         elif tiedHand[0] == "two pair":
             for i in [0, 1]:
-                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
         elif tiedHand[0] == "three of a kind":
             for i in [0, 1, 2]:
-                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
         elif tiedHand[0] == "full house":
             for i in [0, 1, 2]:
-                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
         elif tiedHand[0] == "four of a kind":
             for i in [0, 1, 2, 3]:
-                fullHand1.pop(numsInFullHand1.index(numsDict[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
+                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
         elif tiedHand[0] == "flush":
             fullHand1[0] = fullHand1[0][0] + "♠"
             fullHand2[0] = fullHand2[0][0] + "♠"
@@ -474,7 +478,6 @@ def round():
     deck = []
     playerHand = []
     playersPrint = []
-    playerBalance = 500
     currBet = 0
     playerBet = 0
     action = ""
