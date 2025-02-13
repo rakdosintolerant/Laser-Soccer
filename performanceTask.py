@@ -204,32 +204,34 @@ def handVsHand(hand1, hand2):
         numsInFullHand2 = []
         for i in fullHand1: 
             numsInFullHand1.append(numsDict[i[0]])
+        print("fullHand1: ", fullHand1, "numsInFullHand1: ", numsInFullHand1)
         for i in fullHand2:
             numsInFullHand2.append(numsDict[i[0]])
+        print("fullHand2: ", fullHand2, "numsInFullHand2: ", numsInFullHand2)
         tiedHand = calcHand(hand1)
         if tiedHand[0] == "high card":
-            fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
-            fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
+            fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
+            fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "pair":
             for i in [0, 1]:
-                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "two pair":
             for i in [0, 1]:
-                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "three of a kind":
             for i in [0, 1, 2]:
-                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "full house":
             for i in [0, 1, 2]:
-                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "four of a kind":
             for i in [0, 1, 2, 3]:
-                fullHand1.pop(numsInFullHand1.index(numsDict2[tiedHand[1]]))
-                fullHand2.pop(numsInFullHand2.index(numsDict2[tiedHand[1]]))
+                fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
+                fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "flush":
             fullHand1[0] = fullHand1[0][0] + "♠"
             fullHand2[0] = fullHand2[0][0] + "♠"
