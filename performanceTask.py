@@ -2,6 +2,7 @@
 import random
 import time
 import os
+import sys
 #variables
 deck = []
 playerHand = []
@@ -73,7 +74,11 @@ class opponent:
         #return
         chance = 18
         rating = rateHand(self.getHand())
-        fear = currBet / self.getBalance()
+        try:
+            fear = currBet / self.getBalance()
+        except:
+            self.setBetAndAction(["call", 0])
+            return
         if self.getType() == 0:
             rating *= 2
             fear /= 2
@@ -202,7 +207,7 @@ def handVsHand(hand1, hand2):
     while len(fullHand1) > 2:
         numsInFullHand1 = []
         numsInFullHand2 = []
-        for i in fullHand1: 
+        for i in fullHand1:
             numsInFullHand1.append(numsDict[i[0]])
         print("fullHand1: ", fullHand1, "numsInFullHand1: ", numsInFullHand1)
         for i in fullHand2:
@@ -350,8 +355,6 @@ def playerBetting():
             break
     playerBet = int(playerBet)
     if action == "R": currBet = playerBet
-    playerBalance -= playerBet
-    pot += playerBet
 
 def playerRaise():
     global playerBalance
@@ -400,7 +403,7 @@ def printPlayers():
     time.sleep(0.1)
 
 def roundOfBetting():
-    global currBet, action, currOpps, opps, playerBet, pot, gameOn, winner, playing
+    global currBet, action, currOpps, opps, playerBet, pot, gameOn, winner, playing, playerBalance
     if playing:
         playerBetting()
         if action == "F": playing = False
@@ -423,7 +426,10 @@ def roundOfBetting():
         if checkBets == 0: break
         if playing:
             playerBetting()
-            if action == "F": playing = False
+            if action == "F": 
+                playing = False
+                pot += playerBet
+                playerBalance -= playerBet
         for i in opps:
             checkBets = 0
             for r in currOpps:
@@ -463,17 +469,28 @@ def resetPlayersPrint():
         playersPrint.append(str(i))
 
 def resetBets():
-    global currOpps, gameOn, winner, playerBalance, pot, currBet
+    global currOpps, gameOn, winner, playerBalance, pot, currBet, playerBet
     for i in currOpps:
         pot += i.getBet()
         i.removeBalance(i.getBet())
         i.setBetAndAction(["call", 0])
+    if playing:
+        pot += playerBet
+        playerBalance -= playerBet
     if not gameOn:
         if not winner:
             playerBalance += pot
         else:
             i.addBalance(pot)
     currBet = 0
+
+def youWin():
+    global playerBalance
+    print("With a grand total of ", playerBalance, "you win the game!! Great job and happy gambling.")
+    sys.exit()
+
+def youLose():
+    print("You went bankrupt! Better luck next time...")
 
 def round():
     global currOpps, deck, playerHand, pot, playerBalance, currBet, playerBet, action, board, gameOn, playing, playersPrint
@@ -548,6 +565,17 @@ def round():
     else:
         playerBalance += pot
         print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
+    while True:
+        check = False
+        for i in opps:
+            if i.getBalance() < 1:
+                print(i.getName, "is bankrupt and leaves the game!!")
+                opps.pop(opps.index(i))
+                check = True
+        if not check: break
+    if not opps:
+        youWin()
+    else: youLose()
     input()
 
 for i in range(7):
