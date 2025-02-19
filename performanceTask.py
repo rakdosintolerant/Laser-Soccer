@@ -213,28 +213,28 @@ def handVsHand(hand1, hand2):
         for i in fullHand2:
             numsInFullHand2.append(numsDict[i[0]])
         print("fullHand2: ", fullHand2, "numsInFullHand2: ", numsInFullHand2)
-        tiedHand = calcHand(hand1)
+        tiedHand = calcHand(fullHand1)
         if tiedHand[0] == "high card":
             fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
             fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "pair":
-            for i in [0, 1]:
+            for i in range(2):
                 fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
                 fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "two pair":
-            for i in [0, 1]:
+            for i in range(2):
                 fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
                 fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "three of a kind":
-            for i in [0, 1, 2]:
+            for i in range(3):
                 fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
                 fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "full house":
-            for i in [0, 1, 2]:
+            for i in range(3):
                 fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
                 fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "four of a kind":
-            for i in [0, 1, 2, 3]:
+            for i in range(4):
                 fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
                 fullHand2.pop(numsInFullHand2.index(tiedHand[1]))
         elif tiedHand[0] == "flush":
@@ -248,8 +248,8 @@ def handVsHand(hand1, hand2):
             fullHand2[3] = fullHand1[0][0] + "♣"
         elif tiedHand[0] == "straight" or tiedHand[0] == "straight flush" or tiedHand[0] == "royal flush":
             return False
-        if rateHandonBoard(calcHand(hand1), calcHand(hand2)): 
-            if rateHandonBoard(calcHand(hand1), calcHand(hand2)) == calcHand(hand1): return hand1
+        if rateHandonBoard(calcHand(fullHand1), calcHand(fullHand2)): 
+            if rateHandonBoard(calcHand(fullHand1), calcHand(fullHand2)) == calcHand(fullHand1): return hand1
             return hand2
     return False
     
