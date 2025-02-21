@@ -149,6 +149,7 @@ def flop():
     #board.append("2♣")
     #board.append("3♣")
     #board.append("4♣")
+    clear_screen()
     print("Flop!")
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2])
@@ -158,6 +159,7 @@ def turn():
     global deck
     board.append(deck.pop())
     #board.append("5♣")
+    clear_screen()
     print("Turn!")
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2], board[3])
@@ -167,13 +169,14 @@ def river():
     global deck
     board.append(deck.pop())
     #board.append("6♣")
+    clear_screen()
     print("River!")
     time.sleep(1)
     print("BOARD: ", board[0], board[1], board[2], board[3], board[4])
 
 def whoWins():
     global currOpps, playerHand, playing
-    input()
+    time.sleep(1)
     winners = [False, False]
     winners.pop()
     if playing:
@@ -181,7 +184,6 @@ def whoWins():
     else:
         bestHand = False
     for i in currOpps:
-        print("the handvshand is ", handVsHand(i.getHand(), bestHand))
         if not handVsHand(i.getHand(), bestHand):
             winners.append(i)
         else: 
@@ -193,7 +195,6 @@ def whoWins():
 def handVsHand(hand1, hand2):
     global board
     if not hand2: return hand1
-    print("hand 1,", hand1, "hand 2,", hand2)
     numsDict = {"2" : 2, "3" : 3, "4" : 4, "5" : 5, "6" : 6, "7" : 7, "8" : 8, "9" : 9, "T" : 10, "J" : 11, "Q" : 12, "K" : 13, "A" : 14}
     numsDict2 = {2 : "2", 3 : "3", 4 : "4", 5 : "5", 6 : "6", 7 : "7", 8 : "8", 9 : "9", 10 : "T", 11 : "J", 12 : "Q", 13 : "K", 14 : "A"}
     if rateHandonBoard(calcHand(hand1), calcHand(hand2)): 
@@ -209,10 +210,8 @@ def handVsHand(hand1, hand2):
         numsInFullHand2 = []
         for i in fullHand1:
             numsInFullHand1.append(numsDict[i[0]])
-        print("fullHand1: ", fullHand1, "numsInFullHand1: ", numsInFullHand1)
         for i in fullHand2:
             numsInFullHand2.append(numsDict[i[0]])
-        print("fullHand2: ", fullHand2, "numsInFullHand2: ", numsInFullHand2)
         tiedHand = calcHand(fullHand1)
         if tiedHand[0] == "high card":
             fullHand1.pop(numsInFullHand1.index(tiedHand[1]))
@@ -261,11 +260,8 @@ def calcHand(hand):
         totalBoard = []
         for i in board: totalBoard.append(i)
         for i in hand: totalBoard.append(i)
-        print("len was 2")
     else:
         totalBoard = hand.copy()
-        print("was copiued")
-    print(totalBoard)
     handMine = []
     nums = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     suits = ["♠", "♥", "♦", "♣"]
@@ -491,6 +487,7 @@ def youWin():
 
 def youLose():
     print("You went bankrupt! Better luck next time...")
+    sys.exit()
 
 def round():
     global currOpps, deck, playerHand, pot, playerBalance, currBet, playerBet, action, board, gameOn, playing, playersPrint
@@ -551,8 +548,11 @@ def round():
         resetPlayersPrint()
 
     winner = whoWins()
-    pot = pot // len(winner)
-    if len(winner) > 1:
+    if not winner:
+        playerBalance += pot
+        print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
+    elif len(winner) > 1:
+        pot = pot // len(winner)
         print("There is a split pot because of a tie!")
         for i in winner:
             if i:
@@ -562,20 +562,18 @@ def round():
                 print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
     elif winner:
         winner[0].addBalance(pot)
-    else:
-        playerBalance += pot
-        print(f"You win ${pot} with a {calcHand(playerHand)[0]}! You now have {playerBalance}.")
+        
     while True:
         check = False
         for i in opps:
             if i.getBalance() < 1:
-                print(i.getName, "is bankrupt and leaves the game!!")
+                print(i.getName(), "is bankrupt and leaves the game!!")
                 opps.pop(opps.index(i))
                 check = True
         if not check: break
     if not opps:
         youWin()
-    else: youLose()
+    elif playerBalance < 1: youLose()
     input()
 
 for i in range(7):
