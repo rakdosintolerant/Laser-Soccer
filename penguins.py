@@ -11,7 +11,44 @@ movement = [0, 0]
 xmove = 0
 ymove = 0
 
-penguin = pygame.Rect(600, 300, 50, 50)
+class penguin:
+    def __init__(self, rectangle, num):
+        self.rectangle = rectangle
+        self.num = num
+        self.xmove = 0
+        self.ymove = 0
+        self.flung = False
+        self.color = "red"
+    
+    def setMove(self, xy):
+        self.xmove = xy[0]
+        self.ymove = xy[1]
+
+    def setFlung(self, set):
+        self.flung = set
+    
+    def getMove(self):
+        return [self.xmove, self.ymove]
+    
+    def getFlung(self):
+        return self.flung
+    
+    def getRectangle(self):
+        return self.rectangle
+    
+    def getColor(self):
+        if self.flung: return "red"
+        return "blue"
+    
+    def render(self):
+        pygame.draw.rect(screen, self.getColor(), self.getRectangle())
+
+    def move(self):
+        self.getRectangle().move_ip(self.xmove, self.ymove)
+    
+penguin1 = penguin(pygame.Rect(600, 300, 50, 50), 1)
+
+flingButton = pygame.Rect(600, 500, 200, 100)
 
 while running:
     # poll for events
@@ -19,13 +56,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN: 
             click = True
-            pygame.mouse.set_pos(600, 300)
+            penguin1.getRectangle().update(600, 300, 50, 50)
+            pygame.mouse.set_pos(penguin1.getRectangle().centerx, penguin1.getRectangle().centery)
             pygame.mouse.get_rel()
         elif event.type == pygame.MOUSEBUTTONUP: 
             click = False
             movement = pygame.mouse.get_rel()
-            xmove = -movement[0] / 10
-            ymove = -movement[1] / 10
+            penguin1.setMove([movement[0] / 10, movement[1] / 10])
         if event.type == pygame.QUIT:
             running = False
     # fill the screen with a color to wipe away anything from last frame
@@ -33,13 +70,19 @@ while running:
 
     # RENDER YOUR GAME HERE
     if click:
-        penguin.update(600, 300, 50, 50)
-        pygame.draw.rect(screen, "red", penguin)
-        pygame.draw.line(screen, "green", [penguin.x, penguin.y], pygame.mouse.get_pos())
+        #pygame.draw.rect(screen, penguin.getColor(), penguin1.getRectangle())
+        penguin1.setFlung(False)
+        penguin1.render()
+        pygame.draw.line(screen, "green", [penguin1.getRectangle().centerx, penguin1.getRectangle().centery], pygame.mouse.get_pos())
     else: 
-        penguin.move_ip(xmove, ymove)
-        pygame.draw.rect(screen, "blue", penguin)
+        penguin1.setFlung(True)
+        penguin1.move()
+        penguin1.render()
 
+    if penguin1.getFlung():
+        penguin1.move()
+
+    pygame.draw.rect(screen, "white", flingButton)
     
     # flip() the display to put your work on screen
     pygame.display.flip()
