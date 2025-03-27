@@ -12,7 +12,6 @@ fps = 60
 #penguin constants
 flungPenguinColor = "red"
 unflungPenguinColor = "blue"
-elasticity = 0.9
 penguinSize = 50
 speedReduceOnDrag = 10
 penguinMass = 1
@@ -21,3 +20,11 @@ penguinMass = 1
 activeLineWidth = 2
 setLineWidth = 1
 lineColor = "green"
+
+#wall constants
+wallMass = 10
+
+#physics constants
+elasticity = 0.9
+speedReductionPerFrame = 1.05
+minSpeed = 0.01

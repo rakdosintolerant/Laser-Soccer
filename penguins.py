@@ -75,6 +75,12 @@ class penguin:
         self.setFlung(False)
         self.setMove([0, 0])
 
-    #moves the penguin!
-    def move(self):
-        self.getRectangle().move_ip(self.xmove, self.ymove)
+    #periodic is a term from FRC that means the function runs every frame
+    def periodic(self):
+        if self.flung:
+            self.getRectangle().move_ip(self.xmove, self.ymove)
+            self.xmove /= constants.speedReductionPerFrame
+            self.ymove /= constants.speedReductionPerFrame
+            if abs(self.xmove) < constants.minSpeed: self.xmove = 0
+            if abs(self.ymove) < constants.minSpeed: self.ymove = 0
+        
