@@ -40,6 +40,17 @@ class soccerBall:
     def render(self):
         pygame.draw.rect(screen, "white", self.rectangle)
 
+class soccerNet:
+    def __init__(self):
+        self.leftPost = pygame.Rect(400, 0, 25, 100)
+        self.rightPost = pygame.Rect(600, 0, 25, 100)
+        self.scoringArea = pygame.Rect(425, 0, 175, 100)
+
+    def render(self):
+        pygame.draw.rect(screen, "white", self.leftPost)
+        pygame.draw.rect(screen, "white", self.rightPost)
+        pygame.draw.rect(screen, "orange", self.scoringArea)
+
 #functions
 def resetPenguins(): #returns all penguins to starting position and manner
     for penguin in penguins:
@@ -54,6 +65,7 @@ topWall = pygame.Rect(0, 0, constants.screenXSize, 1)
 leftWall = pygame.Rect(0, 0, 1, constants.screenYSize)
 rightWall = pygame.Rect(constants.screenXSize - 1, 0, 1, constants.screenYSize)
 bottomWall = pygame.Rect(0, constants.screenYSize - 1, constants.screenXSize, 1)
+net = soccerNet()
 walls = [topWall, leftWall, rightWall, bottomWall]
 penguins = [penguin1, penguin2, penguin3]
 
@@ -109,6 +121,7 @@ while running:
         penguin.render()
     ball.periodic()
     ball.render()
+    net.render()
 
     if penguin1.getFlung():
         done = True
@@ -117,8 +130,6 @@ while running:
         if ball.getMove() != [0, 0]: done = False
         if done:
             for penguin in penguins: penguin.setFlung(False)
-
-
     
     # flip() the display to put your work on screen
     pygame.display.flip()

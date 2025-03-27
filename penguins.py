@@ -75,7 +75,7 @@ class penguin:
         self.setFlung(False)
         self.setMove([0, 0])
 
-    #periodic is a term from FRC that means the function runs every frame
+    #periodic is a term I know from FRC that means the function runs every frame
     def periodic(self):
         if self.flung:
             self.getRectangle().move_ip(self.xmove, self.ymove)
