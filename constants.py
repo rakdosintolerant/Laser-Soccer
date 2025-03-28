@@ -9,6 +9,9 @@ screenXSize = 1280
 screenYSize = 720
 fps = 60
 
+#general game constants
+backGroundColor = {"redFling" : [50, 0, 0], "blueFling" : [0, 0, 50], "flinging" : [0, 0, 0]}
+
 #penguin constants
 flungPenguinColor = "red"
 unflungPenguinColor = "blue"
@@ -23,6 +26,9 @@ lineColor = "green"
 
 #wall constants
 wallMass = 10
+
+#net constants
+postMass = 10
 
 #physics constants
 elasticity = 0.9

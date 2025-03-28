@@ -5,13 +5,14 @@ import pygame, constants
 class penguin:
 
     #initialization
-    def __init__(self, rectangle, num, screen):
+    def __init__(self, rectangle, num, team, screen):
         #define variables for the penguin
         self.rectangle = rectangle
         self.startx = rectangle.x
         self.starty = rectangle.y
         self.screen = screen
         self.num = num
+        self.team = team
         self.xmove = 0
         self.ymove = 0
         self.flung = False
@@ -58,8 +59,12 @@ class penguin:
         return self.rectangle
     
     def getColor(self):
-        if self.flung: return constants.flungPenguinColor
-        return constants.unflungPenguinColor
+        if self.team == 1:
+            if self.flung: return [100, 0, 0]
+            return [255, 0, 0]
+        else:
+            if self.flung: return [0, 0, 100]
+            return [0, 0, 255]
     
     #functions that do things
 
