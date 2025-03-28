@@ -1,9 +1,9 @@
 import pygame, constants
 
 class soccerNet:
-    def __init__(self, top, screen):
-        self.top = top
-        if top:
+    def __init__(self, team, screen):
+        self.team = team
+        if team == 0:
             self.leftPost = pygame.Rect(constants.leftPostStartX, 0, constants.postWidth, constants.netHeight)
             self.rightPost = pygame.Rect(constants.rightPostStartX, 0, constants.postWidth, constants.netHeight)
             self.scoringArea = pygame.Rect(constants.scoringAreaStartX, 0, constants.scoringAreaWidth, constants.netHeight)
@@ -44,6 +44,14 @@ class soccerNet:
     
     def getScoringArea(self):
         return self.scoringArea
+    
+    def getTeam(self):
+        return self.team
+    
+    def reset(self):
+        self.leftPost.x = constants.leftPostStartX
+        self.rightPost.x = constants.rightPostStartX
+        self.scoringArea.x = constants.scoringAreaStartX
     
     def turn(self, turnValue):
         if turnValue == "noTurn": return

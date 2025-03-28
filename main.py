@@ -11,10 +11,18 @@ screen = pygame.display.set_mode((constants.screenXSize, constants.screenYSize))
 clock = pygame.time.Clock()
 
 #variables (should try to have as few of these possible, it's bad practice)
+redScore = 0
+blueScore = 0
 running = True
 click = False
 spacePressed = False
 process = ["blueFling", False] #blueFling, redFling, or flinging
+redScoreFont = pygame.font.Font(None, 50)
+blueScoreFont = pygame.font.Font(None, 50)
+redScoreText = redScoreFont.render(str(redScore), True, "yellow")
+blueScoreText = blueScoreFont.render(str(blueScore), True, "yellow")
+redScoreTextPos = redScoreText.get_rect(x=10, y=10)
+blueScoreTextPos = blueScoreText.get_rect(x=10, y=constants.screenYSize - 10 - 50)
 
 #functions
 def resetPenguins(): #returns all penguins to starting position and manner
@@ -33,7 +41,17 @@ def nextStep(): #this could be coded better if you want to fix it Noah
         if process[1]: process[0] = "blueFling"
         else: process[0] = "redFling"
         process[1] = not process[1]
-    pygame.display.set_caption(process[0])
+
+def score(scored):
+    global blueScore, redScore, redScoreText, blueScoreText
+    ball.reset()
+    if scored == 0: blueScore += 1
+    else: redScore += 1
+    redScoreText = redScoreFont.render(str(redScore), True, "yellow")
+    blueScoreText = blueScoreFont.render(str(blueScore), True, "yellow")
+    for penguin in penguins: penguin.reset()
+    for net in nets: net.reset()
+    nextStep()
 
 #initializing penguins/other objects
 redPenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 1, 1, screen)
@@ -60,7 +78,6 @@ while running:
     # poll for events
     # use events for buttons and keys and so forth
     for event in pygame.event.get():
-        #if process != "flinging":
         if process[0] == "blueFling":
             if event.type == pygame.MOUSEBUTTONDOWN: #user clicks
                 for penguin in bluePenguins:
@@ -121,7 +138,8 @@ while running:
         net.turn(resolveNetCollision(ball, net.getRightPost(), net.getSpeed()))
     for wall in walls:
         resolveCollision(ball, wall)
-    if ball.getRectangle().colliderect(net.getScoringArea()): ball.reset()
+    for net in nets:
+        if ball.getRectangle().colliderect(net.getScoringArea()): score(net.getTeam())
     
     
     # RENDER YOUR GAME HERE
@@ -135,6 +153,8 @@ while running:
         penguin.render()
     ball.periodic()
     ball.render()
+    screen.blit(redScoreText, redScoreTextPos)
+    screen.blit(blueScoreText, blueScoreTextPos)
     
 
     if process[0] == "flinging":

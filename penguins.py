@@ -59,10 +59,8 @@ class penguin:
     
     def getColor(self):
         if self.team == 1:
-            if self.flung: return [100, 0, 0]
             return [255, 0, 0]
         else:
-            if self.flung: return [0, 0, 100]
             return [0, 0, 255]
     
     #functions that do things
