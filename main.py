@@ -38,7 +38,7 @@ class soccerBall:
         self.rectangle.y = constants.screenYSize / 2
 
     def periodic(self):
-        self.rectangle.move_ip(self.xmove, self.ymove)
+        self.getRectangle().move_ip(self.xmove, self.ymove)
         self.xmove /= constants.speedReductionPerFrame
         self.ymove /= constants.speedReductionPerFrame
         if abs(self.xmove) < constants.minSpeed: self.xmove = 0
@@ -52,15 +52,15 @@ class soccerNet:
         self.top = top
         if top:
             self.leftPost = pygame.Rect(400, 0, 25, 100)
-            self.rightPost = pygame.Rect(825, 0, 25, 100)
-            self.scoringArea = pygame.Rect(425, 0, 400, 100)
+            self.rightPost = pygame.Rect(1025, 0, 25, 100)
+            self.scoringArea = pygame.Rect(425, 0, 600, 100)
             self.right = True
         else:
             self.leftPost = pygame.Rect(400, constants.screenYSize - 100, 25, 100)
-            self.rightPost = pygame.Rect(825, constants.screenYSize - 100, 25, 100)
-            self.scoringArea = pygame.Rect(425, constants.screenYSize - 100, 400, 100)
+            self.rightPost = pygame.Rect(1025, constants.screenYSize - 100, 25, 100)
+            self.scoringArea = pygame.Rect(425, constants.screenYSize - 100, 600, 100)
             self.right = False
-        self.speed = 5
+        self.speed = 1
 
     def periodic(self):
         if process[0] == "flinging":

@@ -25,8 +25,7 @@ class penguin:
 
     #set's movement in x and y, doesn't actually make it move
     def setMove(self, xy):
-        self.xmove = xy[0]
-        self.ymove = xy[1]
+        self.xmove, self.ymove = xy[0], xy[1]
         self.arrow = pygame.mouse.get_pos()
 
     #this makes the penguin move (with some logic in main)

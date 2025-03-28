@@ -16,7 +16,7 @@ backGroundColor = {"redFling" : [50, 0, 0], "blueFling" : [0, 0, 50], "flinging"
 flungPenguinColor = "red"
 unflungPenguinColor = "blue"
 penguinSize = 50
-speedReduceOnDrag = 10
+speedReduceOnDrag = 40
 penguinMass = 1
 
 #line constants
@@ -32,5 +32,5 @@ postMass = 10
 
 #physics constants
 elasticity = 0.9
-speedReductionPerFrame = 1.05
-minSpeed = 0.01
+speedReductionPerFrame = 1.01
+minSpeed = 0.5
