@@ -1,5 +1,7 @@
 import pygame, constants
 from penguins import penguin
+from ball import soccerBall
+from net import soccerNet
 from resolveCollisions import resolveCollision
 from resolveCollisions import resolveNetCollision
 
@@ -13,93 +15,6 @@ running = True
 click = False
 spacePressed = False
 process = ["blueFling", False] #blueFling, redFling, or flinging
-
-class soccerBall:
-    def __init__(self):
-        self.xmove = 0
-        self.ymove = 0
-        self.rectangle = pygame.Rect(constants.screenXSize / 2, constants.screenYSize / 2, 25, 25)
-
-    def setMove(self, xy):
-        self.xmove, self.ymove = xy[0], xy[1]
-
-    def getMove(self):
-        return [self.xmove, self.ymove]
-    
-    def getRectangle(self):
-        return self.rectangle
-    
-    def getMass(self):
-        return 0.5
-    
-    def reset(self):
-        self.setMove([0, 0])
-        self.rectangle.x = constants.screenXSize / 2
-        self.rectangle.y = constants.screenYSize / 2
-
-    def periodic(self):
-        self.getRectangle().move_ip(self.xmove, self.ymove)
-        self.xmove /= constants.speedReductionPerFrame
-        self.ymove /= constants.speedReductionPerFrame
-        if abs(self.xmove) < constants.minSpeed: self.xmove = 0
-        if abs(self.ymove) < constants.minSpeed: self.ymove = 0
-
-    def render(self):
-        pygame.draw.rect(screen, "white", self.rectangle)
-
-class soccerNet:
-    def __init__(self, top):
-        self.top = top
-        if top:
-            self.leftPost = pygame.Rect(400, 0, 25, 100)
-            self.rightPost = pygame.Rect(1025, 0, 25, 100)
-            self.scoringArea = pygame.Rect(425, 0, 600, 100)
-            self.right = True
-        else:
-            self.leftPost = pygame.Rect(400, constants.screenYSize - 100, 25, 100)
-            self.rightPost = pygame.Rect(1025, constants.screenYSize - 100, 25, 100)
-            self.scoringArea = pygame.Rect(425, constants.screenYSize - 100, 600, 100)
-            self.right = False
-        self.speed = 1
-
-    def periodic(self):
-        if process[0] == "flinging":
-            if self.right:
-                self.leftPost.move_ip(self.speed, 0)
-                self.rightPost.move_ip(self.speed, 0)
-                self.scoringArea.move_ip(self.speed, 0)
-                if self.rightPost.x > constants.screenXSize - 25:
-                    self.right = False
-            else:
-                self.leftPost.move_ip(-self.speed, 0)
-                self.rightPost.move_ip(-self.speed, 0)
-                self.scoringArea.move_ip(-self.speed, 0)
-                if self.leftPost.x < 0:
-                    self.right = True
-
-    def getSpeed(self):
-        if self.right:
-            return self.speed
-        else: return 0 - self.speed
-
-    def getLeftPost(self):
-        return self.leftPost
-    
-    def getRightPost(self):
-        return self.rightPost
-    
-    def getScoringArea(self):
-        return self.scoringArea
-    
-    def turn(self, turnValue):
-        if turnValue == "noTurn": return
-        if abs(turnValue) < self.speed: self.right = not self.right
-
-    def render(self):
-        pygame.draw.rect(screen, "white", self.leftPost)
-        pygame.draw.rect(screen, "white", self.rightPost)
-        pygame.draw.rect(screen, "orange", self.scoringArea)
-
 
 #functions
 def resetPenguins(): #returns all penguins to starting position and manner
@@ -121,20 +36,20 @@ def nextStep(): #this could be coded better if you want to fix it Noah
     pygame.display.set_caption(process[0])
 
 #initializing penguins/other objects
-redPenguin1 = penguin(pygame.Rect(600, 100, constants.penguinSize, constants.penguinSize), 1, 1, screen)
-redPenguin2 = penguin(pygame.Rect(300, 100, constants.penguinSize, constants.penguinSize), 2, 1, screen)
-redPenguin3 = penguin(pygame.Rect(900, 100, constants.penguinSize, constants.penguinSize), 3, 1, screen)
+redPenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 1, 1, screen)
+redPenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 2, 1, screen)
+redPenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 3, 1, screen)
 
-bluePenguin1 = penguin(pygame.Rect(600, 500, constants.penguinSize, constants.penguinSize), 4, 2, screen)
-bluePenguin2 = penguin(pygame.Rect(300, 500, constants.penguinSize, constants.penguinSize), 5, 2, screen)
-bluePenguin3 = penguin(pygame.Rect(900, 500, constants.penguinSize, constants.penguinSize), 6, 2, screen)
-ball = soccerBall()
+bluePenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 4, 2, screen)
+bluePenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 5, 2, screen)
+bluePenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 6, 2, screen)
+ball = soccerBall(screen)
 topWall = pygame.Rect(0, 0, constants.screenXSize, 1)
 leftWall = pygame.Rect(0, 0, 1, constants.screenYSize)
 rightWall = pygame.Rect(constants.screenXSize - 1, 0, 1, constants.screenYSize)
 bottomWall = pygame.Rect(0, constants.screenYSize - 1, constants.screenXSize, 1)
-topNet = soccerNet(True)
-bottomNet = soccerNet(False)
+topNet = soccerNet(True, screen)
+bottomNet = soccerNet(False, screen)
 walls = [topWall, leftWall, rightWall, bottomWall]
 redPenguins = [redPenguin1, redPenguin2, redPenguin3]
 bluePenguins = [bluePenguin1, bluePenguin2, bluePenguin3]
@@ -211,7 +126,7 @@ while running:
     
     # RENDER YOUR GAME HERE
     for net in nets:
-        net.periodic()
+        net.periodic(process)
         net.render()
     for penguin in penguins:
         if penguin.getClicked():

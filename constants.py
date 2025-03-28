@@ -12,23 +12,40 @@ fps = 60
 #general game constants
 backGroundColor = {"redFling" : [50, 0, 0], "blueFling" : [0, 0, 50], "flinging" : [0, 0, 0]}
 
+#net constants
+postMass = 10
+netHeight = 100
+postWidth = 25
+scoringAreaWidth = 600
+scoringAreaStartX = screenXSize / 2 - (scoringAreaWidth / 2)
+leftPostStartX = scoringAreaStartX - postWidth
+rightPostStartX = screenXSize / 2 + (scoringAreaWidth / 2)
+netStartSpeed = 1
+
 #penguin constants
 flungPenguinColor = "red"
 unflungPenguinColor = "blue"
 penguinSize = 50
 speedReduceOnDrag = 40
 penguinMass = 1
+leftRightPenguinOffset = 300
+middlePenguinStart = screenXSize / 2 - (penguinSize / 2)
+rightPenguinStart = middlePenguinStart + leftRightPenguinOffset
+leftPenguinStart = middlePenguinStart - leftRightPenguinOffset
+redPenguinStart = netHeight
+bluePenguinStart = screenYSize - netHeight - penguinSize
 
 #line constants
 activeLineWidth = 2
 setLineWidth = 1
 lineColor = "green"
 
+#ball constants
+ballSize = 25
+ballMass = 0.5
+
 #wall constants
 wallMass = 10
-
-#net constants
-postMass = 10
 
 #physics constants
 elasticity = 0.9
