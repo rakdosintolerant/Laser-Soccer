@@ -5,13 +5,14 @@ import pygame, constants
 class penguin:
 
     #initialization
-    def __init__(self, rectangle, num, screen):
+    def __init__(self, rectangle, num, team, screen):
         #define variables for the penguin
         self.rectangle = rectangle
         self.startx = rectangle.x
         self.starty = rectangle.y
         self.screen = screen
         self.num = num
+        self.team = team
         self.xmove = 0
         self.ymove = 0
         self.flung = False
@@ -24,8 +25,7 @@ class penguin:
 
     #set's movement in x and y, doesn't actually make it move
     def setMove(self, xy):
-        self.xmove = xy[0]
-        self.ymove = xy[1]
+        self.xmove, self.ymove = xy[0], xy[1]
         self.arrow = pygame.mouse.get_pos()
 
     #this makes the penguin move (with some logic in main)
@@ -58,8 +58,12 @@ class penguin:
         return self.rectangle
     
     def getColor(self):
-        if self.flung: return constants.flungPenguinColor
-        return constants.unflungPenguinColor
+        if self.team == 1:
+            if self.flung: return [100, 0, 0]
+            return [255, 0, 0]
+        else:
+            if self.flung: return [0, 0, 100]
+            return [0, 0, 255]
     
     #functions that do things
 
@@ -75,6 +79,12 @@ class penguin:
         self.setFlung(False)
         self.setMove([0, 0])
 
-    #moves the penguin!
-    def move(self):
-        self.getRectangle().move_ip(self.xmove, self.ymove)
+    #periodic is a term I know from FRC that means the function runs every frame
+    def periodic(self):
+        if self.flung:
+            self.getRectangle().move_ip(self.xmove, self.ymove)
+            self.xmove /= constants.speedReductionPerFrame
+            self.ymove /= constants.speedReductionPerFrame
+            if abs(self.xmove) < constants.minSpeed: self.xmove = 0
+            if abs(self.ymove) < constants.minSpeed: self.ymove = 0
+        
