@@ -1,4 +1,4 @@
-import pygame, constants, random
+import pygame, constants, random, time
 from penguins import penguin
 from ball import soccerBall
 from net import soccerNet
@@ -96,13 +96,37 @@ while running:
                         penguin.setClicked(False)
                         click = False
         elif process[0] == "redFling":
+            positions = ["shooter", "positioner", "blocker"]
             for penguin in redPenguins:
-                if penguin.getRectangle().centery + 100 < ball.getRectangle().centery:
-                    penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
-                else:
-                    if random.choice([True, False]):
-                        penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx)  - 300 / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) - 200 / constants.speedReduceOnDrag])
-                    else: penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx)  + 300 / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) - 200 / constants.speedReduceOnDrag])
+                if penguin.getRectangle().centery < ball.getRectangle().centery:
+                    try:
+                        #slope = (ball.getRectangle().centery - penguin.getRectangle().centery) / (ball.getRectangle().centerx - penguin.getRectangle().centerx)
+                        slope = (penguin.getRectangle().centery - ball.getRectangle().centery) / (penguin.getRectangle().centerx - ball.getRectangle().centerx)
+
+                        lineEndPoint = (slope * (0 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
+                        lineStartPoint = (slope * (1000 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
+                        line = [[1000, lineStartPoint], [0, lineEndPoint]]
+                    except:
+                        if ball.getRectangle().centery > penguin.getRectangle().centery:
+                            lineEndPoint = ball.getRectangle().centery + 1000
+                        else: lineEndPoint = ball.getRectangle().centery + 1000
+                        line = [penguin.getRectangle().center, [penguin.getRectangle().centerx, lineEndPoint]]
+                    if bottomNet.getScoringArea().clipline(line):
+                        penguin.setPosition("shooter")
+                    else: penguin.setPosition(None)
+                    pygame.draw.line(screen, "yellow", line[0], line[1])
+                    pygame.display.flip()
+
+                    time.sleep(1)
+                else: penguin.setPosition(None)
+                
+            # for penguin in redPenguins:
+            #     if penguin.getRectangle().centery + 100 < ball.getRectangle().centery:
+            #         penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+            #     else:
+            #         if random.choice([True, False]):
+            #             penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx)  - 300) / constants.speedReduceOnDrag, ((random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) - 100) / constants.speedReduceOnDrag])
+            #         else: penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx)  + 300) / constants.speedReduceOnDrag, ((random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) -100) / constants.speedReduceOnDrag])
 
 
 
