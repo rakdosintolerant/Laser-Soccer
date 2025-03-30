@@ -4,7 +4,6 @@ from ball import soccerBall
 from net import soccerNet
 from resolveCollisions import resolveCollision
 from resolveCollisions import resolveNetCollision
-
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((constants.screenXSize, constants.screenYSize))
@@ -30,6 +29,7 @@ def resetPenguins(): #returns all penguins to starting position and manner
         penguin.reset()
 
 def nextStep(): #this could be coded better if you want to fix it Noah
+    #if it aint broke don't fix it - Noah
     global process
     if process[0] == "blueFling":
         if process[1]: process[0] = "flinging"
