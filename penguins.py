@@ -21,10 +21,10 @@ class penguin:
         self.clicked = False
         self.mass = constants.penguinMass
 
-        self.redImageNormal = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/redFox.png"), (65, 60))
-        self.redImageSuper = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/redFoxSuper.png"), (65, 60))
-        self.blueImageNormal = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/bluePenguin.png"), (55, 50))
-        self.blueImageSuper = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/bluePenguinSuper.png"), (65, 60))
+        self.redImageNormal = pygame.transform.scale(pygame.image.load("images/redFox.png"), (65, 60))
+        self.redImageSuper = pygame.transform.scale(pygame.image.load("images/redFoxSuper.png"), (65, 60))
+        self.blueImageNormal = pygame.transform.scale(pygame.image.load("images/bluePenguin.png"), (55, 50))
+        self.blueImageSuper = pygame.transform.scale(pygame.image.load("images/bluePenguinSuper.png"), (65, 60))
         if self.team == 2:
             self.images = (self.blueImageNormal, self.blueImageSuper)
             self.image = self.blueImageNormal
