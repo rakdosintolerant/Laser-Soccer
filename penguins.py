@@ -20,6 +20,7 @@ class penguin:
         self.arrow = [0, 0]
         self.clicked = False
         self.mass = constants.penguinMass
+        self.position = None
 
     #Setters to change penguin variables
 
@@ -35,6 +36,9 @@ class penguin:
     def setClicked(self, set):
         self.clicked = set
     
+    def setPosition(self, set):
+        self.position = set
+
     #Getters
 
     def getMove(self):
@@ -57,7 +61,11 @@ class penguin:
     def getRectangle(self):
         return self.rectangle
     
+    def getPosition(self):
+        return self.position
+    
     def getColor(self):
+        if self.position == "shooter": return [0, 255, 0]
         if self.team == 1:
             return [255, 0, 0]
         else:
