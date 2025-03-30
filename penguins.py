@@ -38,7 +38,7 @@ class penguin:
     #set's movement in x and y, doesn't actually make it move
     def setMove(self, xy):
         self.xmove, self.ymove = xy[0], xy[1]
-        self.arrow = pygame.mouse.get_pos()
+        self.arrow = [self.rectangle.centerx + (xy[0] * constants.speedReduceOnDrag), self.rectangle.centery + (xy[1] * constants.speedReduceOnDrag)]
 
     #this makes the penguin move (with some logic in main)
     def setFlung(self, set):
