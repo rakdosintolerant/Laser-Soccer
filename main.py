@@ -1,4 +1,4 @@
-import pygame, constants
+import pygame, constants, random
 from penguins import penguin
 from ball import soccerBall
 from net import soccerNet
@@ -41,6 +41,8 @@ def nextStep(): #this could be coded better if you want to fix it Noah
         if process[1]: process[0] = "blueFling"
         else: process[0] = "redFling"
         process[1] = not process[1]
+    if process[0] == "flinging":
+        for penguin in penguins: penguin.setFlung(True)
 
 def score(scored):
     global blueScore, redScore, redScoreText, blueScoreText
@@ -94,20 +96,31 @@ while running:
                         penguin.setClicked(False)
                         click = False
         elif process[0] == "redFling":
-            if event.type == pygame.MOUSEBUTTONDOWN: #user clicks
-                for penguin in redPenguins:
-                    if penguin.getRectangle().collidepoint(pygame.mouse.get_pos()): #check which penguin is being clicked, if any
-                        penguin.setClicked(True)
-                        click = True
-                        pygame.mouse.set_pos(penguin.getRectangle().centerx, penguin.getRectangle().centery) #puts mouse in the center of the penguin
-                        pygame.mouse.get_rel() #remembers where the mouse is
-            elif event.type == pygame.MOUSEBUTTONUP: #user releases
-                for penguin in redPenguins:
-                    if penguin.getClicked(): #if one of the penguins was being manipulated
-                        movement = pygame.mouse.get_rel() #mouse movement from when penguin was initially clicked
-                        penguin.setMove([movement[0] / constants.speedReduceOnDrag, movement[1] / constants.speedReduceOnDrag]) #penguin's speed will be based on where user dragged the mouse
-                        penguin.setClicked(False)
-                        click = False
+            for penguin in redPenguins:
+                if penguin.getRectangle().centery + 100 < ball.getRectangle().centery:
+                    penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                else:
+                    if random.choice([True, False]):
+                        penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx)  - 300 / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) - 200 / constants.speedReduceOnDrag])
+                    else: penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx)  + 300 / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) - 200 / constants.speedReduceOnDrag])
+
+
+
+            nextStep()
+            # if event.type == pygame.MOUSEBUTTONDOWN: #user clicks
+            #     for penguin in redPenguins:
+            #         if penguin.getRectangle().collidepoint(pygame.mouse.get_pos()): #check which penguin is being clicked, if any
+            #             penguin.setClicked(True)
+            #             click = True
+            #             pygame.mouse.set_pos(penguin.getRectangle().centerx, penguin.getRectangle().centery) #puts mouse in the center of the penguin
+            #             pygame.mouse.get_rel() #remembers where the mouse is
+            # elif event.type == pygame.MOUSEBUTTONUP: #user releases
+            #     for penguin in redPenguins:
+            #         if penguin.getClicked(): #if one of the penguins was being manipulated
+            #             movement = pygame.mouse.get_rel() #mouse movement from when penguin was initially clicked
+            #             penguin.setMove([movement[0] / constants.speedReduceOnDrag, movement[1] / constants.speedReduceOnDrag]) #penguin's speed will be based on where user dragged the mouse
+            #             penguin.setClicked(False)
+            #             click = False
         if event.type == pygame.QUIT:
             running = False
     # fill the screen with a color to wipe away anything from last frame
@@ -117,8 +130,6 @@ while running:
     if keys[pygame.K_SPACE] and not spacePressed: #if space is being pressed (not held down)
         if not click:
             nextStep()
-            if process[0] == "flinging": 
-                for penguin in penguins: penguin.setFlung(True) #flings the penguins
         spacePressed = True
     else:
         if (not keys[pygame.K_SPACE]) and spacePressed: #if space was released, variable reflects that
