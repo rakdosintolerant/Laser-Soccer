@@ -21,6 +21,18 @@ class penguin:
         self.clicked = False
         self.mass = constants.penguinMass
 
+        self.redImageNormal = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/redFox.png"), (65, 60))
+        self.redImageSuper = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/redFoxSuper.png"), (65, 60))
+        self.blueImageNormal = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/bluePenguin.png"), (55, 50))
+        self.blueImageSuper = pygame.transform.scale(pygame.image.load("SkillsUSA Game/images/bluePenguinSuper.png"), (65, 60))
+        if self.team == 2:
+            self.images = (self.blueImageNormal, self.blueImageSuper)
+            self.image = self.blueImageNormal
+        else:
+            self.images = (self.redImageNormal, self.redImageSuper)
+            self.image = self.redImageNormal
+        
+
     #Setters to change penguin variables
 
     #set's movement in x and y, doesn't actually make it move
@@ -67,7 +79,8 @@ class penguin:
 
     #renders both the penguin and its corresponding line
     def render(self):
-        pygame.draw.rect(self.screen, self.getColor(), self.getRectangle())
+        if not self.image: pygame.draw.rect(self.screen, self.getColor(), self.getRectangle())
+        else: self.screen.blit(self.image, self.rectangle)
         if (self.xmove != 0 or self.ymove != 0) and not self.flung: 
             pygame.draw.line(self.screen, constants.lineColor, [self.getRectangle().centerx, self.getRectangle().centery], self.arrow, constants.setLineWidth)
 
@@ -86,3 +99,13 @@ class penguin:
             if abs(self.xmove) < constants.minSpeed: self.xmove = 0
             if abs(self.ymove) < constants.minSpeed: self.ymove = 0
         
+        #updating image based on current event
+        import main
+        if self.team == 2:
+            if main.process[0] == "redFling":
+                self.image = self.images[0]
+            else: self.image = self.images[1]
+        else:
+            if main.process[0] == "blueFling":
+                self.image = self.images[0]
+            else: self.image = self.images[1]
