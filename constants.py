@@ -25,7 +25,7 @@ netStartSpeed = 1
 #penguin constants
 flungPenguinColor = "red"
 unflungPenguinColor = "blue"
-penguinSize = 50
+penguinSize = 60
 speedReduceOnDrag = 40
 penguinMass = 1
 leftRightPenguinOffset = 300
