@@ -5,8 +5,8 @@
 #please add it here, then just use constants.[varName] elsewhere.
 
 #pygame constants
-screenXSize = 1280
-screenYSize = 720
+screenXSize = 1400
+screenYSize = 800
 fps = 60
 
 #general game constants

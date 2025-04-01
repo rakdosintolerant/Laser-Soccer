@@ -5,7 +5,7 @@ class soccerBall:
         self.ymove = 0
         self.screen = screen
         self.rectangle = pygame.Rect(0, 0, constants.ballSize, constants.ballSize)
-        self.rectangle.centerx = constants.screenXSize / 2
+        self.rectangle.centerx = 300
         self.rectangle.centery = constants.screenYSize / 2
 
     def setMove(self, xy):
@@ -22,7 +22,7 @@ class soccerBall:
     
     def reset(self):
         self.setMove([0, 0])
-        self.rectangle.x = constants.screenXSize / 2
+        self.rectangle.x = 300
         self.rectangle.y = constants.screenYSize / 2
 
     def periodic(self):
