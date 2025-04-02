@@ -5,8 +5,8 @@
 #please add it here, then just use constants.[varName] elsewhere.
 
 #pygame constants
-screenXSize = 1280
-screenYSize = 720
+screenXSize = 1400
+screenYSize = 800
 fps = 60
 
 #general game constants
@@ -25,7 +25,7 @@ netStartSpeed = 1
 #penguin constants
 flungPenguinColor = "red"
 unflungPenguinColor = "blue"
-penguinSize = 50
+penguinSize = 60
 speedReduceOnDrag = 40
 penguinMass = 1
 leftRightPenguinOffset = 300
