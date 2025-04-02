@@ -116,9 +116,10 @@ while running:
                     else: penguin.setPosition(None)
                     pygame.draw.line(screen, "yellow", line[0], line[1])
                     pygame.display.flip()
-
-                    time.sleep(1)
-                else: penguin.setPosition(None)
+                    time.sleep(0.1)
+                else:
+                    for bluePeng in bluePenguins:
+                        dist = abs()
                 
             # for penguin in redPenguins:
             #     if penguin.getRectangle().centery + 100 < ball.getRectangle().centery:
