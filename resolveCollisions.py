@@ -8,7 +8,12 @@ def resolveCollision(peng1, peng2):
             rect2 = peng2
             wall = True
 
-        if not rect1.colliderect(rect2): return
+        if not rect1.colliderect(rect2):
+            #if wall: peng1.setWalled(False)
+            return
+        if wall:
+            if peng1.getWalled(): return
+            peng1.setWalled(True)
         # Calculate overlap in both axes
         overlap_x = min(rect1.right - rect2.left, rect2.right - rect1.left)
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
@@ -21,15 +26,19 @@ def resolveCollision(peng1, peng2):
             else: v2 = peng2.getMove()[0]
             
             # Calculate new velocities using conservation of momentum and energy
-            
-            if not wall:
+            if wall:
+                if rect2.width == 1:
+                    new_v1 = -(constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+                else: new_v1 = (constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+            else:
                 new_v1 = (constants.elasticity * peng2.getMass() * (v2 - v1) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
                 new_v2 = (constants.elasticity * peng1.getMass() * (v1 - v2) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
 
             peng1.setMove([new_v1, peng1.getMove()[1]])
             if not wall: peng2.setMove([new_v2, peng2.getMove()[1]])
             
-        
+            print("x:", new_v1)
+
             
             # Calculate velocities along the collision normal
             v1 = peng1.getMove()[1]
@@ -37,14 +46,23 @@ def resolveCollision(peng1, peng2):
             else: v2 = peng2.getMove()[1]
             
             # Calculate new velocities using conservation of momentum and energy
-            if not wall:
+            if wall:
+                if rect2.height == 1:
+                    new_v1 = -(constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+                else: new_v1 = (constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+            else:
                 new_v1 = (constants.elasticity * peng2.getMass() * (v2 - v1) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
                 new_v2 = (constants.elasticity * peng1.getMass() * (v1 - v2) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
             
+            print("y:", new_v1)
+
             peng1.setMove([peng1.getMove()[0], new_v1])
             if not wall: peng2.setMove([peng2.getMove()[0], new_v2])
 
             # Determine the axis of least penetration
+            # if wall:
+            #     if rect2.y == constants.screenYSize: peng1.setMove([-v1, peng1.getMove()[1]])
+            #     else: peng1.setMove([peng1.getMove()[0], -v2])
             if overlap_x < overlap_y:
                 # Horizontal collision
                 if rect1.centerx < rect2.centerx:
@@ -53,7 +71,7 @@ def resolveCollision(peng1, peng2):
                 else:
                     # Rect1 is to the right of rect2
                     rect1.x = rect2.right
-                peng1.setMove([-v1, peng1.getMove()[1]])
+                #if wall: peng1.setMove([-v1, peng1.getMove()[1]])
             else:
                 # Vertical collision
                 if rect1.centery < rect2.centery:
@@ -62,7 +80,7 @@ def resolveCollision(peng1, peng2):
                 else:
                     # Rect1 is below rect2
                     rect1.y = rect2.bottom
-                peng1.setMove([peng1.getMove()[0], -v2])
+                #if wall: peng1.setMove([peng1.getMove()[0], -v2])
         
 
 
@@ -77,6 +95,7 @@ def resolveNetCollision(peng1, post1, postSpeed):
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
         
         # Determine the axis of least penetration
+
         if overlap_x < overlap_y:
             # Horizontal collision
             if rect1.centerx < rect2.centerx:

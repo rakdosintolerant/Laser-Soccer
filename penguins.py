@@ -19,6 +19,7 @@ class penguin:
         self.color = "red"
         self.arrow = [0, 0]
         self.clicked = False
+        self.walled = False
         self.mass = constants.penguinMass
 
         self.redImageNormal = pygame.transform.scale(pygame.image.load("images/redFox.png"), (65, 60))
@@ -46,6 +47,10 @@ class penguin:
 
     def setClicked(self, set):
         self.clicked = set
+
+    def setWalled(self, set):
+        if set != self.walled: print("walled changed to ", set)
+        self.walled = set
     
     #Getters
 
@@ -68,6 +73,9 @@ class penguin:
     
     def getRectangle(self):
         return self.rectangle
+    
+    def getWalled(self):
+        return self.walled
     
     def getColor(self):
         if self.team == 1:

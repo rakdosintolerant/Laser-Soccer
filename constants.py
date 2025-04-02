@@ -45,7 +45,8 @@ ballSize = 25
 ballMass = 0.5
 
 #wall constants
-wallMass = 10
+wallMass = 0.1
+wallThickness = 1
 
 #physics constants
 elasticity = 0.9
