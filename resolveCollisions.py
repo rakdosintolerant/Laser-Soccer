@@ -9,11 +9,7 @@ def resolveCollision(peng1, peng2):
             wall = True
 
         if not rect1.colliderect(rect2):
-            #if wall: peng1.setWalled(False)
             return
-        if wall:
-            if peng1.getWalled(): return
-            peng1.setWalled(True)
         # Calculate overlap in both axes
         overlap_x = min(rect1.right - rect2.left, rect2.right - rect1.left)
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
@@ -37,9 +33,6 @@ def resolveCollision(peng1, peng2):
             peng1.setMove([new_v1, peng1.getMove()[1]])
             if not wall: peng2.setMove([new_v2, peng2.getMove()[1]])
             
-            print("x:", new_v1)
-
-            
             # Calculate velocities along the collision normal
             v1 = peng1.getMove()[1]
             if wall: v2 = 0
@@ -53,9 +46,7 @@ def resolveCollision(peng1, peng2):
             else:
                 new_v1 = (constants.elasticity * peng2.getMass() * (v2 - v1) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
                 new_v2 = (constants.elasticity * peng1.getMass() * (v1 - v2) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
-            
-            print("y:", new_v1)
-
+                
             peng1.setMove([peng1.getMove()[0], new_v1])
             if not wall: peng2.setMove([peng2.getMove()[0], new_v2])
 

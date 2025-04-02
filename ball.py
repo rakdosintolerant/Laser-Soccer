@@ -4,16 +4,12 @@ class soccerBall:
         self.xmove = 0
         self.ymove = 0
         self.screen = screen
-        self.walled = False
         self.rectangle = pygame.Rect(0, 0, constants.ballSize, constants.ballSize)
         self.rectangle.centerx = 300
         self.rectangle.centery = constants.screenYSize / 2
 
     def setMove(self, xy):
         self.xmove, self.ymove = xy[0], xy[1]
-
-    def setWalled(self, set):
-        self.walled = set
 
     def getMove(self):
         return [self.xmove, self.ymove]
@@ -23,9 +19,6 @@ class soccerBall:
     
     def getMass(self):
         return constants.ballMass
-    
-    def getWalled(self):
-        return self.walled
     
     def reset(self):
         self.setMove([0, 0])
