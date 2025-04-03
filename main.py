@@ -2,6 +2,7 @@ import pygame, constants, random, time
 from penguins import penguin
 from ball import soccerBall
 from net import soccerNet
+from slopeLine import makeLine, getSlope
 from resolveCollisions import resolveCollision
 from resolveCollisions import resolveNetCollision
 # pygame setup
@@ -56,20 +57,20 @@ def score(scored):
     nextStep()
 
 #initializing penguins/other objects
-redPenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 1, 1, screen)
-redPenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 2, 1, screen)
-redPenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 3, 1, screen)
+redPenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 0, 1, screen)
+redPenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 1, 1, screen)
+redPenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 2, 1, screen)
 
-bluePenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 4, 2, screen)
-bluePenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 5, 2, screen)
-bluePenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 6, 2, screen)
+bluePenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 3, 2, screen)
+bluePenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 4, 2, screen)
+bluePenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 5, 2, screen)
 ball = soccerBall(screen)
 topWall = pygame.Rect(0, 0, constants.screenXSize, constants.netHeight)
 leftWall = pygame.Rect(0, 0, constants.wallThickness, constants.screenYSize)
 rightWall = pygame.Rect(constants.screenXSize - constants.wallThickness, 0, constants.wallThickness, constants.screenYSize)
 bottomWall = pygame.Rect(0, constants.screenYSize - constants.netHeight, constants.screenXSize, constants.netHeight)
-topNet = soccerNet(True, screen)
-bottomNet = soccerNet(False, screen)
+topNet = soccerNet(False, screen)
+bottomNet = soccerNet(True, screen)
 walls = [topWall, leftWall, rightWall, bottomWall]
 redPenguins = [redPenguin1, redPenguin2, redPenguin3]
 bluePenguins = [bluePenguin1, bluePenguin2, bluePenguin3]
@@ -96,31 +97,71 @@ while running:
                         penguin.setClicked(False)
                         click = False
         elif process[0] == "redFling":
-            positions = ["shooter", "positioner", "blocker"]
+            defense = False
+            shooters = []
+            for penguin in bluePenguins:
+                if penguin.getRectangle().centery > ball.getRectangle().centery:
+                    line = makeLine(penguin, ball)
+                    if topNet.getScoringArea().clipline(line):
+                        defense = True
             for penguin in redPenguins:
                 if penguin.getRectangle().centery < ball.getRectangle().centery:
-                    try:
-                        #slope = (ball.getRectangle().centery - penguin.getRectangle().centery) / (ball.getRectangle().centerx - penguin.getRectangle().centerx)
-                        slope = (penguin.getRectangle().centery - ball.getRectangle().centery) / (penguin.getRectangle().centerx - ball.getRectangle().centerx)
-
-                        lineEndPoint = (slope * (0 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
-                        lineStartPoint = (slope * (1000 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
-                        line = [[1000, lineStartPoint], [0, lineEndPoint]]
-                    except:
-                        if ball.getRectangle().centery > penguin.getRectangle().centery:
-                            lineEndPoint = ball.getRectangle().centery + 1000
-                        else: lineEndPoint = ball.getRectangle().centery + 1000
-                        line = [penguin.getRectangle().center, [penguin.getRectangle().centerx, lineEndPoint]]
+                    line = makeLine(penguin, ball)
                     if bottomNet.getScoringArea().clipline(line):
                         penguin.setPosition("shooter")
+                        shooters.append(penguin)
                     else: penguin.setPosition(None)
                     pygame.draw.line(screen, "yellow", line[0], line[1])
                     pygame.display.flip()
                     time.sleep(0.1)
+                # dist = ((blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2) ** 0.5
+                # if dist > penguin.getDist()[0]: penguin.setDist([dist, blue.id])
+                for blue in bluePenguins:
+                    dist = ((blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2) ** 0.5
+                    if (dist < penguin.getDist()[0]) or (penguin.getDist()[0] == 0): penguin.setDist([dist, blue.id])
+            if len(shooters) > 1:
+                bestShooter = False
+                for shooter in shooters:
+                    if (not bestShooter) or bestShooter.getDistFromBall() > shooter.getDistFromBall():
+                        bestShooter = shooter
+                for shooter in shooters:
+                    if shooter.id != bestShooter.id:
+                        shooter.setPosition(None)
+            else: 
+                try: bestShooter = shooter[0]
+                except: continue
+            if not shooter:
+                defender = 0
+                for penguin in redPenguins:
+                    if (not defender) or (penguin.getDistFromBall() < defender.getDistFromBall()):
+                        defender = penguin
+                defender.setPosition("shooter")
+            for penguin in redPenguins:
+                screen = 0
+                for penguin in redPenguins:
+                    if not penguin.getPosition():
+                        if (not screen) or (penguin.getDist() < screen.getDist()):
+                            screen = penguin
+                try:
+                    screen.setPosition("screen")
+                except: continue
+            for penguin in redPenguins:
+                if not penguin.getPosition():
+                    penguin.setPosition("center")
+
+            for penguin in redPenguins:
+                if penguin.getPosition() == "shooter":
+                    slope = getSlope(penguin, ball)
+                    endPoint = slope * ((ball.getRectangle().centerx + 50) - ball.getRectangle().centerx) + ball.getRectangle().centery
+                    penguin.setMove([ball.getRectangle().centerx + 50, endPoint])
+                elif penguin.getPosition() == "screen":
+                    target = bluePenguins[penguin.getDist()[1]]
+                    slope = getSlope(penguin, target)
+                    endPoint = slope * ((target.getRectangle().centerx + 100) - target.getRectangle().centerx) + target.getRectangle().centery
+                    penguin.setMove([target.getRectangle().centerx + 100, endPoint])
                 else:
-                    for bluePeng in bluePenguins:
-                        dist = abs()
-                
+                    penguin.setMove([(constants.screenXSize / 2) - penguin.getRectangle().centerx, 100 - penguin.getRectangle().centery])
+            nextStep()
             # for penguin in redPenguins:
             #     if penguin.getRectangle().centery + 100 < ball.getRectangle().centery:
             #         penguin.setMove([(random.randint(ball.getRectangle().centerx - constants.targetingMarginOfError, ball.getRectangle().centerx + constants.targetingMarginOfError) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.targetingMarginOfError, ball.getRectangle().centery + constants.targetingMarginOfError) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
@@ -131,7 +172,6 @@ while running:
 
 
 
-            nextStep()
             # if event.type == pygame.MOUSEBUTTONDOWN: #user clicks
             #     for penguin in redPenguins:
             #         if penguin.getRectangle().collidepoint(pygame.mouse.get_pos()): #check which penguin is being clicked, if any

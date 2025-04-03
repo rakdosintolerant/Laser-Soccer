@@ -21,6 +21,8 @@ class penguin:
         self.clicked = False
         self.mass = constants.penguinMass
         self.position = None
+        self.distFromBall = 0
+        self.dist = [0, 0]
 
         self.redImageNormal = pygame.transform.scale(pygame.image.load("images/redFox.png"), (65, 60))
         self.redImageSuper = pygame.transform.scale(pygame.image.load("images/redFoxSuper.png"), (65, 60))
@@ -51,6 +53,12 @@ class penguin:
     def setPosition(self, set):
         self.position = set
 
+    def setDistFromBall(self, set):
+        self.distFromBall = set
+
+    def setDist(self, set):
+        self.dist = set
+
     #Getters
 
     def getMove(self):
@@ -75,6 +83,12 @@ class penguin:
     
     def getPosition(self):
         return self.position
+    
+    def getDist(self):
+        return self.dist
+    
+    def getDistFromBall(self):
+        return self.distFromBall
     
     def getColor(self):
         if self.position == "shooter": return [0, 255, 0]
