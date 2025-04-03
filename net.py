@@ -35,6 +35,9 @@ class soccerNet:
                 if self.leftPost.x < 0:
                     self.right = True
 
+    def setSpeed(self, set):
+        self.speed = set
+
     def getSpeed(self):
         if self.right:
             return self.speed

@@ -2,6 +2,7 @@ import pygame, constants
 from penguins import penguin
 from ball import soccerBall
 from net import soccerNet
+from powerUps import powerUp
 from resolveCollisions import resolveCollision
 from resolveCollisions import resolveNetCollision
 # pygame setup
@@ -54,13 +55,13 @@ def score(scored):
     nextStep()
 
 #initializing penguins/other objects
-redPenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 1, 1, screen)
-redPenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 2, 1, screen)
-redPenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 3, 1, screen)
+redPenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 1, 0, screen)
+redPenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 2, 0, screen)
+redPenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.redPenguinStart, constants.penguinSize, constants.penguinSize), 3, 0, screen)
 
-bluePenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 4, 2, screen)
-bluePenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 5, 2, screen)
-bluePenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 6, 2, screen)
+bluePenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 4, 1, screen)
+bluePenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 5, 1, screen)
+bluePenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 6, 1, screen)
 ball = soccerBall(screen)
 topWall = pygame.Rect(0, 0, constants.screenXSize, constants.netHeight)
 leftWall = pygame.Rect(0, 0, constants.wallThickness, constants.screenYSize)
@@ -73,6 +74,8 @@ redPenguins = [redPenguin1, redPenguin2, redPenguin3]
 bluePenguins = [bluePenguin1, bluePenguin2, bluePenguin3]
 penguins = [redPenguin1, redPenguin2, redPenguin3, bluePenguin1, bluePenguin2, bluePenguin3]
 nets = [topNet, bottomNet]
+power = powerUp(screen)
+
 
 while running:
     # poll for events
@@ -137,6 +140,7 @@ while running:
             if penguin.id != otherPenguin.id: resolveCollision(penguin, otherPenguin)
         for wall in walls:
             if not penguin.getRectangle().colliderect(topNet.getScoringArea()) and not penguin.getRectangle().colliderect(bottomNet.getScoringArea()): resolveCollision(penguin, wall)
+        if penguin.getRectangle().colliderect(power.getRectangle()): power.acquired(penguin.getTeam())
     for net in nets:
         net.turn(resolveNetCollision(ball, net.getLeftPost(), net.getSpeed()))
         net.turn(resolveNetCollision(ball, net.getRightPost(), net.getSpeed()))
@@ -156,6 +160,7 @@ while running:
         penguin.render()
     ball.periodic()
     ball.render()
+    power.render()
     screen.blit(redScoreText, redScoreTextPos)
     screen.blit(blueScoreText, blueScoreTextPos)
 

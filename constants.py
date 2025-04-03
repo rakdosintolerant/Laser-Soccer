@@ -49,6 +49,9 @@ ballMass = 0.5
 wallMass = 10
 wallThickness = 10
 
+#powerup constants
+powerUpSize = 25
+
 #physics constants
 elasticity = 0.9
 speedReductionPerFrame = 1.01

@@ -25,7 +25,7 @@ class penguin:
         self.redImageSuper = pygame.transform.scale(pygame.image.load("images/redFoxSuper.png"), (65, 60))
         self.blueImageNormal = pygame.transform.scale(pygame.image.load("images/bluePenguin.png"), (55, 50))
         self.blueImageSuper = pygame.transform.scale(pygame.image.load("images/bluePenguinSuper.png"), (65, 60))
-        if self.team == 2:
+        if self.team == 1:
             self.images = (self.blueImageNormal, self.blueImageSuper)
             self.image = self.blueImageNormal
         else:
@@ -60,6 +60,9 @@ class penguin:
     def id(self):
         return self.num
     
+    def getTeam(self):
+        return self.team
+    
     def getFlung(self):
         return self.flung
     
@@ -70,7 +73,7 @@ class penguin:
         return self.rectangle
     
     def getColor(self):
-        if self.team == 1:
+        if self.team == 0:
             return [255, 0, 0]
         else:
             return [0, 0, 255]
@@ -101,7 +104,7 @@ class penguin:
         
         #updating image based on current event
         import main
-        if self.team == 2:
+        if self.team == 1:
             if main.process[0] == "redFling":
                 self.image = self.images[0]
             else: self.image = self.images[1]
