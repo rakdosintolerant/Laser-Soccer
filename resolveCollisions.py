@@ -15,6 +15,36 @@ def resolveCollision(peng1, peng2):
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
         
         if True:
+            if wall: print("colliding with wall")
+            if overlap_x < overlap_y:
+                # Horizontal collision
+                if rect1.centerx < rect2.centerx:
+                    # Rect1 is to the left of rect2
+                    rect1.x = rect2.left - rect1.width
+                    if wall and (peng1.getMove()[0] <= 0): 
+                        print("canceled")
+                        return
+                else:
+                    # Rect1 is to the right of rect2
+                    rect1.x = rect2.right
+                    if wall and (peng1.getMove()[0] >= 0): 
+                        print("canceled")
+                        return
+            else:
+                # Vertical collision
+                if rect1.centery < rect2.centery:
+                    # Rect1 is above rect2
+                    rect1.y = rect2.top - rect1.height
+                    if wall and (peng1.getMove()[1] <= 0): 
+                        print("canceled")
+                        return
+                else:
+                    # Rect1 is below rect2
+                    rect1.y = rect2.bottom  
+                    if wall and (peng1.getMove()[1] >= 0): 
+                        print("canceled")
+                        return
+
             new_v1 = 0
             # Calculate velocities along the collision normal
             v1 = peng1.getMove()[0]
@@ -23,9 +53,9 @@ def resolveCollision(peng1, peng2):
             
             # Calculate new velocities using conservation of momentum and energy
             if wall:
-                if rect2.width == 1:
-                    new_v1 = -(constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
-                else: new_v1 = (constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+                if rect2.width == constants.wallThickness:
+                    new_v1 = (constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+                else: new_v1 = -(constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
             else:
                 new_v1 = (constants.elasticity * peng2.getMass() * (v2 - v1) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
                 new_v2 = (constants.elasticity * peng1.getMass() * (v1 - v2) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
@@ -40,39 +70,20 @@ def resolveCollision(peng1, peng2):
             
             # Calculate new velocities using conservation of momentum and energy
             if wall:
-                if rect2.height == 1:
-                    new_v1 = -(constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
-                else: new_v1 = (constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+                if rect2.height == constants.netHeight:
+                    new_v1 = (constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
+                else: new_v1 = -(constants.elasticity * constants.wallMass * (v2 - v1) + peng1.getMass() * v1 + constants.wallMass * v2) / (peng1.getMass() + constants.wallMass)
             else:
                 new_v1 = (constants.elasticity * peng2.getMass() * (v2 - v1) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
                 new_v2 = (constants.elasticity * peng1.getMass() * (v1 - v2) + peng1.getMass() * v1 + peng2.getMass() * v2) / (peng1.getMass() + peng2.getMass())
-                
+
             peng1.setMove([peng1.getMove()[0], new_v1])
             if not wall: peng2.setMove([peng2.getMove()[0], new_v2])
 
             # Determine the axis of least penetration
             # if wall:
             #     if rect2.y == constants.screenYSize: peng1.setMove([-v1, peng1.getMove()[1]])
-            #     else: peng1.setMove([peng1.getMove()[0], -v2])
-            if overlap_x < overlap_y:
-                # Horizontal collision
-                if rect1.centerx < rect2.centerx:
-                    # Rect1 is to the left of rect2
-                    rect1.x = rect2.left - rect1.width
-                else:
-                    # Rect1 is to the right of rect2
-                    rect1.x = rect2.right
-                #if wall: peng1.setMove([-v1, peng1.getMove()[1]])
-            else:
-                # Vertical collision
-                if rect1.centery < rect2.centery:
-                    # Rect1 is above rect2
-                    rect1.y = rect2.top - rect1.height
-                else:
-                    # Rect1 is below rect2
-                    rect1.y = rect2.bottom
-                #if wall: peng1.setMove([peng1.getMove()[0], -v2])
-        
+            #     else: peng1.setMove([peng1.getMove()[0], -v2])      
 
 
 

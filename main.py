@@ -62,10 +62,10 @@ bluePenguin1 = penguin(pygame.Rect(constants.leftPenguinStart, constants.bluePen
 bluePenguin2 = penguin(pygame.Rect(constants.middlePenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 5, 2, screen)
 bluePenguin3 = penguin(pygame.Rect(constants.rightPenguinStart, constants.bluePenguinStart, constants.penguinSize, constants.penguinSize), 6, 2, screen)
 ball = soccerBall(screen)
-topWall = pygame.Rect(0, 0, constants.screenXSize, constants.wallThickness)
+topWall = pygame.Rect(0, 0, constants.screenXSize, constants.netHeight)
 leftWall = pygame.Rect(0, 0, constants.wallThickness, constants.screenYSize)
 rightWall = pygame.Rect(constants.screenXSize - constants.wallThickness, 0, constants.wallThickness, constants.screenYSize)
-bottomWall = pygame.Rect(0, constants.screenYSize - constants.wallThickness, constants.screenXSize, constants.wallThickness)
+bottomWall = pygame.Rect(0, constants.screenYSize - constants.netHeight, constants.screenXSize, constants.netHeight)
 topNet = soccerNet(True, screen)
 bottomNet = soccerNet(False, screen)
 walls = [topWall, leftWall, rightWall, bottomWall]
@@ -124,25 +124,28 @@ while running:
         if (not keys[pygame.K_SPACE]) and spacePressed: #if space was released, variable reflects that
             spacePressed = False
 
+    for net in nets:
+        if ball.getRectangle().colliderect(net.getScoringArea()): score(net.getTeam())
+        
     for penguin in penguins: #checks to see if each penguin is colliding and, if so, runs the physics
         for net in nets:
             net.turn(resolveNetCollision(penguin, net.getLeftPost(), net.getSpeed()))
             net.turn(resolveNetCollision(penguin, net.getRightPost(), net.getSpeed()))
+            resolveNetCollision(penguin, net.getBackPost(), net.getSpeed())
         resolveCollision(penguin, ball)
         for otherPenguin in penguins:
             if penguin.id != otherPenguin.id: resolveCollision(penguin, otherPenguin)
         for wall in walls:
-            resolveCollision(penguin, wall)
+            if not penguin.getRectangle().colliderect(topNet.getScoringArea()) and not penguin.getRectangle().colliderect(bottomNet.getScoringArea()): resolveCollision(penguin, wall)
     for net in nets:
         net.turn(resolveNetCollision(ball, net.getLeftPost(), net.getSpeed()))
         net.turn(resolveNetCollision(ball, net.getRightPost(), net.getSpeed()))
     for wall in walls:
         resolveCollision(ball, wall)
-    for net in nets:
-        if ball.getRectangle().colliderect(net.getScoringArea()): score(net.getTeam())
     
     
     # RENDER YOUR GAME HERE
+    for wall in walls: pygame.draw.rect(screen, "white", wall)
     for net in nets:
         net.periodic(process)
         net.render()
@@ -155,7 +158,6 @@ while running:
     ball.render()
     screen.blit(redScoreText, redScoreTextPos)
     screen.blit(blueScoreText, blueScoreTextPos)
-    
 
     if process[0] == "flinging":
         done = True

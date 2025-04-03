@@ -15,6 +15,7 @@ backGroundColor = {"redFling" : [50, 0, 0], "blueFling" : [0, 0, 50], "flinging"
 #net constants
 postMass = 10
 netHeight = 100
+backPostHeight = 10
 postWidth = 25
 scoringAreaWidth = 600
 scoringAreaStartX = screenXSize / 2 - (scoringAreaWidth / 2)
@@ -45,8 +46,8 @@ ballSize = 25
 ballMass = 0.5
 
 #wall constants
-wallMass = 0.1
-wallThickness = 1
+wallMass = 10
+wallThickness = 10
 
 #physics constants
 elasticity = 0.9
