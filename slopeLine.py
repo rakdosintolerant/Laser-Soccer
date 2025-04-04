@@ -1,6 +1,5 @@
 def makeLine(penguin, ball):
                     try:
-                        #slope = (ball.getRectangle().centery - penguin.getRectangle().centery) / (ball.getRectangle().centerx - penguin.getRectangle().centerx)
                         slope = (penguin.getRectangle().centery - ball.getRectangle().centery) / (penguin.getRectangle().centerx - ball.getRectangle().centerx)
 
                         lineEndPoint = (slope * (0 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
@@ -18,7 +17,7 @@ def getSlope(penguin, ball):
             slope = (penguin.getRectangle().centery - ball.getRectangle().centery) / (penguin.getRectangle().centerx - ball.getRectangle().centerx)
         except:
             if ball.getRectangle().centery > penguin.getRectangle().centery:
-                slope = 9999
-        else: slope -9999
+                slope = 10
+        else: slope -10
 
         return slope
