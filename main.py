@@ -104,7 +104,6 @@ while running:
                     line = makeLine(penguin, ball)
                     if topNet.getScoringArea().clipline(line):
                         defense = True
-            print("defense?", defense)
             for penguin in redPenguins:
                 penguin.setPosition(None)
                 if penguin.getRectangle().centery < ball.getRectangle().centery:
@@ -113,15 +112,9 @@ while running:
                         penguin.setPosition("shooter")
                         shooters.append(penguin)
                     else: penguin.setPosition(None)
-                    pygame.draw.line(screen, "yellow", line[0], line[1])
-                    pygame.display.flip()
-                    time.sleep(0.1)
-                # dist = ((blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2) ** 0.5
-                # if dist > penguin.getDist()[0]: penguin.setDist([dist, blue.id])
                 for blue in bluePenguins:
                     dist = ((blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2) ** 0.5
                     if (dist < penguin.getDist()[0]) or (penguin.getDist()[0] == 0): penguin.setDist([dist, blue.id])
-            print("number of shooters: ", len(shooters))
             if len(shooters) > 1:
                 bestShooter = False
                 for shooter in shooters:
@@ -155,15 +148,15 @@ while running:
             for penguin in redPenguins:
                 if penguin.getPosition() == "shooter":
                     penguin.setMove([(ball.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 4), (ball.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 4)])
-                    print("shooting at x:", penguin.getMove()[0], "y:", penguin.getMove()[1])
                 elif penguin.getPosition() == "screen":
                     target = bluePenguins[penguin.getDist()[1]-3]
                     penguin.setMove([(target.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 2), (target.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 2)])
-                    print("screening at x:", penguin.getMove()[0], "y:", penguin.getMove()[1])
                 else:
-                    penguin.setMove([((random.randint(ball.getRectangle().centerx - 400, ball.getRectangle().centerx + 400) / 2) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - 300, ball.getRectangle().centery - 100) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
-                    print("centering at x:", penguin.getMove()[0], "y:", penguin.getMove()[1])
-                    
+                    penguin.setMove([((random.randint(ball.getRectangle().centerx - 400, ball.getRectangle().centerx + 400)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - 300, ball.getRectangle().centery - 100) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                penguin.render()
+                pygame.display.flip()
+                time.sleep(1)
+
             nextStep()
             # for penguin in redPenguins:
             #     if penguin.getRectangle().centery + 100 < ball.getRectangle().centery:
