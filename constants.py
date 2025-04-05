@@ -53,6 +53,7 @@ wallThickness = 10
 elasticity = 0.9
 speedReductionPerFrame = 1.01
 minSpeed = 0.5
+terminalVelocity = 20
 
 #opponent constants
 targetingMarginOfError = 50

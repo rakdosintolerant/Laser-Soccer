@@ -40,6 +40,9 @@ class penguin:
 
     #set's movement in x and y, doesn't actually make it move
     def setMove(self, xy):
+        while abs(((xy[0] ** 2) + (xy[1]) ** 2) ** 0.5) > constants.terminalVelocity:
+            xy[0] *= 0.99
+            xy[1] *= 0.99
         self.xmove, self.ymove = xy[0], xy[1]
         self.arrow = [self.rectangle.centerx + (xy[0] * constants.speedReduceOnDrag), self.rectangle.centery + (xy[1] * constants.speedReduceOnDrag)]
 

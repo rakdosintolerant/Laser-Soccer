@@ -9,6 +9,9 @@ class soccerBall:
         self.rectangle.centery = constants.screenYSize / 2
 
     def setMove(self, xy):
+        while abs(((xy[0] ** 2) + (xy[1]) ** 2) ** 0.5) > constants.terminalVelocity:
+            xy[0] *= 0.99
+            xy[1] *= 0.99
         self.xmove, self.ymove = xy[0], xy[1]
 
     def getMove(self):
