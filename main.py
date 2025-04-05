@@ -16,13 +16,18 @@ blueScore = 0
 running = True
 click = False
 spacePressed = False
-process = ["blueFling", False] #blueFling, redFling, or flinging
-redScoreFont = pygame.font.Font(None, 50)
-blueScoreFont = pygame.font.Font(None, 50)
-redScoreText = redScoreFont.render(str(redScore), True, "yellow")
-blueScoreText = blueScoreFont.render(str(blueScore), True, "yellow")
+process = ["titleScreen", False] #titleScreen, blueFling, redFling, or flinging
+process[0] = "blueFling"
+process[0] = "titleScreen"
+
+redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
+blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
+titleScreenText = pygame.font.Font(None, 200).render("Laser Soccer", True, "white")
+titleInstructionsText = pygame.font.Font(None, 50).render("Press Z for 1 player | Press X for 2 player | Press C for 0 player", True, "white")
 redScoreTextPos = redScoreText.get_rect(x=10, y=10)
 blueScoreTextPos = blueScoreText.get_rect(x=10, y=constants.screenYSize - 10 - 50)
+titleScreenTextPos = titleScreenText.get_rect(centerx=constants.screenXSize / 2, y=300)
+titleInstructionsTextPos = titleInstructionsText.get_rect(centerx=constants.screenXSize / 2, y = 500)
 isRedAi = True
 isBlueAi = False
 
@@ -48,15 +53,23 @@ def renderScreen():
 
 def nextStep(): #this could be coded better if you want to fix it Noah
     #if it aint broke don't fix it - Noah
-    global process
-    if process[0] == "blueFling":
+    global process, redScore, blueScore, redScoreText, blueScoreText
+    if process[0] == "titleScreen":
+        process[0] = "blueFling"
+    elif process[0] == "blueFling":
         if process[1]: process[0] = "flinging"
         else: process[0] = "redFling"
     elif process[0] == "redFling": 
         if process[1]: process[0] = "blueFling"
         else: process[0] = "flinging"
     elif process[0] == "flinging": 
-        if process[1]: process[0] = "blueFling"
+        if blueScore >= 3 or redScore >= 3: 
+            blueScore = 0
+            redScore = 0
+            redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
+            blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
+            process = ["titleScreen", 0]
+        elif process[1]: process[0] = "blueFling"
         else: process[0] = "redFling"
         process[1] = not process[1]
     if process[0] == "flinging":
@@ -67,8 +80,8 @@ def score(scored):
     ball.reset()
     if scored == 0: blueScore += 1
     else: redScore += 1
-    redScoreText = redScoreFont.render(str(redScore), True, "yellow")
-    blueScoreText = blueScoreFont.render(str(blueScore), True, "yellow")
+    redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
+    blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
     for penguin in penguins: penguin.reset()
     for net in nets: net.reset()
     nextStep()
@@ -111,6 +124,7 @@ while running:
                             defense = True
                 for penguin in bluePenguins:
                     penguin.setPosition(None)
+                    penguin.setDistFromBall(((ball.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (ball.getRectangle().centery - penguin.getRectangle().centery) ** 2) ** 0.5)
                     if penguin.getRectangle().centery > ball.getRectangle().centery:
                         line = makeLine(penguin, ball)
                         if topNet.getScoringArea().clipline(line):
@@ -118,7 +132,7 @@ while running:
                             shooters.append(penguin)
                         else: penguin.setPosition(None)
                     for red in redPenguins:
-                        dist = ((red.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (red.getRectangle().centerx - penguin.getRectangle().centerx) ** 2) ** 0.5
+                        dist = ((red.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (red.getRectangle().centery - penguin.getRectangle().centery) ** 2) ** 0.5
                         if (dist < penguin.getDist()[0]) or (penguin.getDist()[0] == 0): penguin.setDist([dist, red.id])
                 if len(shooters) > 1:
                     bestShooter = False
@@ -156,7 +170,7 @@ while running:
                         target = redPenguins[penguin.getDist()[1]-3]
                         penguin.setMove([(target.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 2), (target.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 2)])
                     else:
-                        penguin.setMove([((random.randint(ball.getRectangle().centerx - 400, ball.getRectangle().centerx + 400)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery + 100, ball.getRectangle().centery + 300) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                        penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery + 100, ball.getRectangle().centery + 300) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
                     renderScreen()
                     time.sleep(1)
 
@@ -188,6 +202,8 @@ while running:
                             defense = True
                 for penguin in redPenguins:
                     penguin.setPosition(None)
+                    penguin.setDist([0, 0])
+                    penguin.setDistFromBall(((ball.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (ball.getRectangle().centery - penguin.getRectangle().centery) ** 2) ** 0.5)
                     if penguin.getRectangle().centery < ball.getRectangle().centery:
                         line = makeLine(penguin, ball)
                         if bottomNet.getScoringArea().clipline(line):
@@ -195,7 +211,7 @@ while running:
                             shooters.append(penguin)
                         else: penguin.setPosition(None)
                     for blue in bluePenguins:
-                        dist = ((blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2) ** 0.5
+                        dist = ((blue.getRectangle().centerx - penguin.getRectangle().centerx) ** 2 + (blue.getRectangle().centery - penguin.getRectangle().centery) ** 2) ** 0.5
                         if (dist < penguin.getDist()[0]) or (penguin.getDist()[0] == 0): penguin.setDist([dist, blue.id])
                 if len(shooters) > 1:
                     bestShooter = False
@@ -216,13 +232,12 @@ while running:
                     defender.setPosition("shooter")
                 movingScreen = 0
                 for penguin in redPenguins:
-                    for penguin in redPenguins:
-                        if not penguin.getPosition():
-                            if (not movingScreen) or (penguin.getDist() < movingScreen.getDist()):
-                                movingScreen = penguin
-                try:
-                    movingScreen.setPosition("screen")
-                except: 0
+                    if not penguin.getPosition():
+                        if (not movingScreen) or (penguin.getDist() < movingScreen.getDist()):
+                            movingScreen = penguin
+
+                movingScreen.setPosition("screen")
+
                 for penguin in redPenguins:
                     if not penguin.getPosition():
                         penguin.setPosition("center")
@@ -230,11 +245,15 @@ while running:
                 for penguin in redPenguins:
                     if penguin.getPosition() == "shooter":
                         penguin.setMove([(ball.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 4), (ball.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 4)])
+                        print("shooting with a dist of ", penguin.getDist())
                     elif penguin.getPosition() == "screen":
                         target = bluePenguins[penguin.getDist()[1]-3]
                         penguin.setMove([(target.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 2), (target.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 2)])
+                        print("screening with a dist of ", penguin.getDist())
                     else:
-                        penguin.setMove([((random.randint(ball.getRectangle().centerx - 400, ball.getRectangle().centerx + 400)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - 300, ball.getRectangle().centery - 100) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                        penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - 300, ball.getRectangle().centery - 100) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                        print("centering with a dist of ", penguin.getDist())
+
                     renderScreen()
                     time.sleep(1)
 
@@ -262,52 +281,78 @@ while running:
     screen.fill(constants.backGroundColor[process[0]])
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_SPACE] and not spacePressed: #if space is being pressed (not held down)
-        if not click:
+    if process[0] == "titleScreen":
+        if keys[pygame.K_z]:
+            isBlueAi = False
+            isRedAi = True
             nextStep()
-        spacePressed = True
+        elif keys[pygame.K_x]:
+            isBlueAi = False
+            isRedAi = False
+            nextStep()
+        elif keys[pygame.K_c]:
+            isBlueAi = True
+            isRedAi = True
+            nextStep()
+        screen.blit(titleScreenText, titleScreenTextPos)
+        screen.blit(titleInstructionsText, titleInstructionsTextPos)
+        pygame.display.flip()
+
     else:
-        if (not keys[pygame.K_SPACE]) and spacePressed: #if space was released, variable reflects that
-            spacePressed = False
 
-    for net in nets:
-        if ball.getRectangle().colliderect(net.getScoringArea()): score(net.getTeam())
-        
-    for penguin in penguins: #checks to see if each penguin is colliding and, if so, runs the physics
+        if keys[pygame.K_SPACE] and not spacePressed: #if space is being pressed (not held down)
+            if not click:
+                nextStep()
+            spacePressed = True
+        else:
+            if (not keys[pygame.K_SPACE]) and spacePressed: #if space was released, variable reflects that
+                spacePressed = False
+
+
         for net in nets:
-            net.turn(resolveNetCollision(penguin, net.getLeftPost(), net.getSpeed()))
-            net.turn(resolveNetCollision(penguin, net.getRightPost(), net.getSpeed()))
-            resolveNetCollision(penguin, net.getBackPost(), net.getSpeed())
-        resolveCollision(penguin, ball)
-        for otherPenguin in penguins:
-            if penguin.id != otherPenguin.id: resolveCollision(penguin, otherPenguin)
+            if ball.getRectangle().colliderect(net.getScoringArea()): score(net.getTeam())
+            
+        for penguin in penguins: #checks to see if each penguin is colliding and, if so, runs the physics
+            for net in nets:
+                net.turn(resolveNetCollision(penguin, net.getLeftPost(), net.getSpeed()))
+                net.turn(resolveNetCollision(penguin, net.getRightPost(), net.getSpeed()))
+                resolveNetCollision(penguin, net.getBackPost(), net.getSpeed())
+            resolveCollision(penguin, ball)
+            for otherPenguin in penguins:
+                if penguin.id != otherPenguin.id: resolveCollision(penguin, otherPenguin)
+            for wall in walls:
+                if not penguin.getRectangle().colliderect(topNet.getScoringArea()) and not penguin.getRectangle().colliderect(bottomNet.getScoringArea()): resolveCollision(penguin, wall)
+        for net in nets:
+            net.turn(resolveNetCollision(ball, net.getLeftPost(), net.getSpeed()))
+            net.turn(resolveNetCollision(ball, net.getRightPost(), net.getSpeed()))
         for wall in walls:
-            if not penguin.getRectangle().colliderect(topNet.getScoringArea()) and not penguin.getRectangle().colliderect(bottomNet.getScoringArea()): resolveCollision(penguin, wall)
-    for net in nets:
-        net.turn(resolveNetCollision(ball, net.getLeftPost(), net.getSpeed()))
-        net.turn(resolveNetCollision(ball, net.getRightPost(), net.getSpeed()))
-    for wall in walls:
-        resolveCollision(ball, wall)
-    
-    
-    # periodics
-    for net in nets:
-        net.periodic(process)
-    for penguin in penguins:
-        penguin.periodic()
-    ball.periodic()
+            resolveCollision(ball, wall)
 
-    renderScreen()
+        
+        
+        # periodics
+        for net in nets:
+            net.periodic(process)
+        
 
-    if process[0] == "flinging":
-        done = True
         for penguin in penguins:
-            if penguin.getMove() != [0, 0]: done = False
-        if ball.getMove() != [0, 0]: done = False
-        if done:
-            nextStep()
-            for penguin in penguins: penguin.setFlung(False)
+            penguin.periodic(process)
+
+
+        ball.periodic()
+
+        renderScreen()
+
+        if process[0] == "flinging":
+            done = True
+            for penguin in penguins:
+                if penguin.getMove() != [0, 0]: done = False
+            if ball.getMove() != [0, 0]: done = False
+            if done:
+                nextStep()
+                for penguin in penguins: penguin.setFlung(False)
     
+
     clock.tick(constants.fps)  # limits FPS to 60
 
 pygame.quit()
