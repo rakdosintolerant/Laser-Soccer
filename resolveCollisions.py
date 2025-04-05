@@ -15,20 +15,17 @@ def resolveCollision(peng1, peng2):
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
         
         if True:
-            if wall: print("colliding with wall")
             if overlap_x < overlap_y:
                 # Horizontal collision
                 if rect1.centerx < rect2.centerx:
                     # Rect1 is to the left of rect2
                     rect1.x = rect2.left - rect1.width
                     if wall and (peng1.getMove()[0] <= 0): 
-                        print("canceled")
                         return
                 else:
                     # Rect1 is to the right of rect2
                     rect1.x = rect2.right
                     if wall and (peng1.getMove()[0] >= 0): 
-                        print("canceled")
                         return
             else:
                 # Vertical collision
@@ -36,13 +33,11 @@ def resolveCollision(peng1, peng2):
                     # Rect1 is above rect2
                     rect1.y = rect2.top - rect1.height
                     if wall and (peng1.getMove()[1] <= 0): 
-                        print("canceled")
                         return
                 else:
                     # Rect1 is below rect2
                     rect1.y = rect2.bottom  
                     if wall and (peng1.getMove()[1] >= 0): 
-                        print("canceled")
                         return
 
             new_v1 = 0

@@ -29,7 +29,7 @@ unflungPenguinColor = "blue"
 penguinSize = 60
 speedReduceOnDrag = 40
 penguinMass = 1
-leftRightPenguinOffset = 300
+leftRightPenguinOffset = 100
 middlePenguinStart = screenXSize / 2 - (penguinSize / 2)
 rightPenguinStart = middlePenguinStart + leftRightPenguinOffset
 leftPenguinStart = middlePenguinStart - leftRightPenguinOffset
@@ -53,3 +53,7 @@ wallThickness = 10
 elasticity = 0.9
 speedReductionPerFrame = 1.01
 minSpeed = 0.5
+terminalVelocity = 20
+
+#opponent constants
+targetingMarginOfError = 50

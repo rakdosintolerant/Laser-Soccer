@@ -20,6 +20,9 @@ class penguin:
         self.arrow = [0, 0]
         self.clicked = False
         self.mass = constants.penguinMass
+        self.position = None
+        self.distFromBall = 0
+        self.dist = [0, 0]
 
         self.redImageNormal = pygame.transform.scale(pygame.image.load("images/redFox.png"), (65, 60))
         self.redImageSuper = pygame.transform.scale(pygame.image.load("images/redFoxSuper.png"), (65, 60))
@@ -37,8 +40,11 @@ class penguin:
 
     #set's movement in x and y, doesn't actually make it move
     def setMove(self, xy):
+        while abs(((xy[0] ** 2) + (xy[1]) ** 2) ** 0.5) > constants.terminalVelocity:
+            xy[0] *= 0.99
+            xy[1] *= 0.99
         self.xmove, self.ymove = xy[0], xy[1]
-        self.arrow = pygame.mouse.get_pos()
+        self.arrow = [self.rectangle.centerx + (xy[0] * constants.speedReduceOnDrag), self.rectangle.centery + (xy[1] * constants.speedReduceOnDrag)]
 
     #this makes the penguin move (with some logic in main)
     def setFlung(self, set):
@@ -47,6 +53,15 @@ class penguin:
     def setClicked(self, set):
         self.clicked = set
     
+    def setPosition(self, set):
+        self.position = set
+
+    def setDistFromBall(self, set):
+        self.distFromBall = set
+
+    def setDist(self, set):
+        self.dist = set
+
     #Getters
 
     def getMove(self):
@@ -69,7 +84,17 @@ class penguin:
     def getRectangle(self):
         return self.rectangle
     
+    def getPosition(self):
+        return self.position
+    
+    def getDist(self):
+        return self.dist
+    
+    def getDistFromBall(self):
+        return self.distFromBall
+    
     def getColor(self):
+        if self.position == "shooter": return [0, 255, 0]
         if self.team == 1:
             return [255, 0, 0]
         else:
