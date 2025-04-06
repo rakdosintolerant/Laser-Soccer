@@ -17,8 +17,6 @@ running = True
 click = False
 spacePressed = False
 process = ["titleScreen", False] #titleScreen, blueFling, redFling, or flinging
-process[0] = "blueFling"
-process[0] = "titleScreen"
 
 redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
 blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
@@ -54,6 +52,7 @@ def renderScreen():
 def nextStep(): #this could be coded better if you want to fix it Noah
     #if it aint broke don't fix it - Noah
     global process, redScore, blueScore, redScoreText, blueScoreText
+    print("start of nextStep,", process)
     if process[0] == "titleScreen":
         process[0] = "blueFling"
     elif process[0] == "blueFling":
@@ -68,12 +67,13 @@ def nextStep(): #this could be coded better if you want to fix it Noah
             redScore = 0
             redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
             blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
-            process = ["titleScreen", 0]
+            process = ["titleScreen", True]
         elif process[1]: process[0] = "blueFling"
         else: process[0] = "redFling"
         process[1] = not process[1]
     if process[0] == "flinging":
         for penguin in penguins: penguin.setFlung(True)
+    print("end of nextStep,", process, "\n")
 
 def score(scored):
     global blueScore, redScore, redScoreText, blueScoreText
@@ -245,14 +245,14 @@ while running:
                 for penguin in redPenguins:
                     if penguin.getPosition() == "shooter":
                         penguin.setMove([(ball.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 4), (ball.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 4)])
-                        print("shooting with a dist of ", penguin.getDist())
+                        #print("shooting with a dist of ", penguin.getDist())
                     elif penguin.getPosition() == "screen":
                         target = bluePenguins[penguin.getDist()[1]-3]
                         penguin.setMove([(target.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 2), (target.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 2)])
-                        print("screening with a dist of ", penguin.getDist())
+                        #print("screening with a dist of ", penguin.getDist())
                     else:
                         penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - 300, ball.getRectangle().centery - 100) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
-                        print("centering with a dist of ", penguin.getDist())
+                        #print("centering with a dist of ", penguin.getDist())
 
                     renderScreen()
                     time.sleep(1)
