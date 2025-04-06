@@ -52,7 +52,6 @@ def renderScreen():
 def nextStep(): #this could be coded better if you want to fix it Noah
     #if it aint broke don't fix it - Noah
     global process, redScore, blueScore, redScoreText, blueScoreText
-    print("start of nextStep,", process)
     if process[0] == "titleScreen":
         process[0] = "blueFling"
     elif process[0] == "blueFling":
@@ -73,7 +72,6 @@ def nextStep(): #this could be coded better if you want to fix it Noah
         process[1] = not process[1]
     if process[0] == "flinging":
         for penguin in penguins: penguin.setFlung(True)
-    print("end of nextStep,", process, "\n")
 
 def score(scored):
     global blueScore, redScore, redScoreText, blueScoreText
@@ -149,17 +147,24 @@ while running:
                     defender = 0
                     for penguin in bluePenguins:
                         if (not defender) or (penguin.getDistFromBall() < defender.getDistFromBall()):
-                            defender = penguin
-                    defender.setPosition("shooter")
+                            if penguin.getRectangle().centery < ball.getRectangle().centery:
+                                line = makeLine(penguin, ball)
+                                if not bottomNet.getScoringArea().clipline(line): defender = penguin
+                            else: defender = penguin
+                    if defender:
+                        defender.setPosition("shooter")
                 movingScreen = 0
                 for penguin in bluePenguins:
-                    for penguin in bluePenguins:
-                        if not penguin.getPosition():
-                            if (not movingScreen) or (penguin.getDist() < movingScreen.getDist()):
-                                movingScreen = penguin
-                try:
-                    movingScreen.setPosition("screen")
-                except: 0
+                    if not penguin.getPosition():
+                        if (not movingScreen) or (penguin.getDist()[0] < movingScreen.getDist()[0]):
+                            movingScreen = penguin
+                if movingScreen:
+                    if movingScreen.getDist()[0] > constants.maxScreenDist:
+                        if random.randint(0, 1):
+                            movingScreen.setPosition("screen")
+                    else: 
+                        if random.randint(0, 3):
+                            movingScreen.setPosition("screen")
                 for penguin in bluePenguins:
                     if not penguin.getPosition():
                         penguin.setPosition("center")
@@ -170,7 +175,13 @@ while running:
                         target = redPenguins[penguin.getDist()[1]-3]
                         penguin.setMove([(target.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 2), (target.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 2)])
                     else:
-                        penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery + 100, ball.getRectangle().centery + 300) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                            if penguin.getRectangle().centery < ball.getRectangle().centery:
+                                line = makeLine(penguin, ball)
+                                if not bottomNet.getScoringArea().clipline(line):
+                                    if random.randint(0, 1):
+                                        penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx - constants.penguinSize - constants.ballSize)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery + constants.aiMinAboveBall, ball.getRectangle().centery + constants.aiMaxAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                                    else:  ([((random.randint(ball.getRectangle().centerx + constants.ballSize + constants.penguinSize, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery + constants.aiMinAboveBall, ball.getRectangle().centery + constants.aiMaxAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                            else: penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery + constants.aiMinAboveBall, ball.getRectangle().centery + constants.aiMaxAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
                     renderScreen()
                     time.sleep(1)
 
@@ -228,15 +239,24 @@ while running:
                     defender = 0
                     for penguin in redPenguins:
                         if (not defender) or (penguin.getDistFromBall() < defender.getDistFromBall()):
-                            defender = penguin
-                    defender.setPosition("shooter")
+                            if penguin.getRectangle().centery > ball.getRectangle().centery:
+                                line = makeLine(penguin, ball)
+                                if not topNet.getScoringArea().clipline(line): defender = penguin
+                            else: defender = penguin
+                    if defender:
+                        defender.setPosition("shooter")
                 movingScreen = 0
                 for penguin in redPenguins:
                     if not penguin.getPosition():
-                        if (not movingScreen) or (penguin.getDist() < movingScreen.getDist()):
+                        if (not movingScreen) or (penguin.getDist()[0] < movingScreen.getDist()[0]):
                             movingScreen = penguin
-
-                movingScreen.setPosition("screen")
+                if movingScreen:
+                    if movingScreen.getDist()[0] > constants.maxScreenDist:
+                        if random.randint(0, 1):
+                            movingScreen.setPosition("screen")
+                    else: 
+                        if random.randint(0, 3):
+                            movingScreen.setPosition("screen")
 
                 for penguin in redPenguins:
                     if not penguin.getPosition():
@@ -245,14 +265,20 @@ while running:
                 for penguin in redPenguins:
                     if penguin.getPosition() == "shooter":
                         penguin.setMove([(ball.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 4), (ball.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 4)])
-                        #print("shooting with a dist of ", penguin.getDist())
                     elif penguin.getPosition() == "screen":
                         target = bluePenguins[penguin.getDist()[1]-3]
+                        
                         penguin.setMove([(target.getRectangle().centerx - penguin.getRectangle().centerx) / (constants.speedReduceOnDrag / 2), (target.getRectangle().centery - penguin.getRectangle().centery) / (constants.speedReduceOnDrag / 2)])
-                        #print("screening with a dist of ", penguin.getDist())
                     else:
-                        penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - 300, ball.getRectangle().centery - 100) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
-                        #print("centering with a dist of ", penguin.getDist())
+                        if penguin.getRectangle().centery < ball.getRectangle().centery:
+                            line = makeLine(penguin, ball)
+                            if not bottomNet.getScoringArea().clipline(line):
+                                if random.randint(0, 1):
+                                    penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx - constants.penguinSize - constants.ballSize)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.aiMaxAboveBall, ball.getRectangle().centery - constants.aiMinAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                                else:  ([((random.randint(ball.getRectangle().centerx + constants.ballSize + constants.penguinSize, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.aiMaxAboveBall, ball.getRectangle().centery - constants.aiMinAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+                        else: penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.aiMaxAboveBall, ball.getRectangle().centery - constants.aiMinAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
+
+                        penguin.setMove([((random.randint(ball.getRectangle().centerx - constants.aiPositioningMarginX, ball.getRectangle().centerx + constants.aiPositioningMarginX)) - penguin.getRectangle().centerx) / constants.speedReduceOnDrag, (random.randint(ball.getRectangle().centery - constants.aiMaxAboveBall, ball.getRectangle().centery - constants.aiMinAboveBall) - penguin.getRectangle().centery) / constants.speedReduceOnDrag])
 
                     renderScreen()
                     time.sleep(1)

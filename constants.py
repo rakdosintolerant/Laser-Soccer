@@ -57,4 +57,7 @@ terminalVelocity = 20
 
 #opponent constants
 targetingMarginOfError = 50
-aiPositioningMarginX = 200
+aiPositioningMarginX = 100 #200
+aiMinAboveBall = 100
+aiMaxAboveBall = 200 #300
+maxScreenDist = 300
