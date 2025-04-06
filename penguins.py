@@ -114,9 +114,11 @@ class penguin:
         self.getRectangle().update(self.startx, self.starty, constants.penguinSize, constants.penguinSize)
         self.setFlung(False)
         self.setMove([0, 0])
+        self.dist = [0, 0]
+        self.distFromBall = 0
 
     #periodic is a term I know from FRC that means the function runs every frame
-    def periodic(self):
+    def periodic(self, process):
         if self.flung:
             self.getRectangle().move_ip(self.xmove, self.ymove)
             self.xmove /= constants.speedReductionPerFrame
@@ -125,12 +127,11 @@ class penguin:
             if abs(self.ymove) < constants.minSpeed: self.ymove = 0
         
         #updating image based on current event
-        import main
         if self.team == 2:
-            if main.process[0] == "redFling":
+            if process[0] == "redFling":
                 self.image = self.images[0]
             else: self.image = self.images[1]
         else:
-            if main.process[0] == "blueFling":
+            if process[0] == "blueFling":
                 self.image = self.images[0]
             else: self.image = self.images[1]

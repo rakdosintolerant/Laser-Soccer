@@ -10,7 +10,7 @@ screenYSize = 800
 fps = 60
 
 #general game constants
-backGroundColor = {"redFling" : [50, 0, 0], "blueFling" : [0, 0, 50], "flinging" : [0, 0, 0]}
+backGroundColor = {"titleScreen" : [0, 0, 0], "redFling" : [50, 0, 0], "blueFling" : [0, 0, 50], "flinging" : [0, 0, 0]}
 
 #net constants
 postMass = 10
@@ -57,3 +57,4 @@ terminalVelocity = 20
 
 #opponent constants
 targetingMarginOfError = 50
+aiPositioningMarginX = 200
