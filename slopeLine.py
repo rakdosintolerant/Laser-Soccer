@@ -3,8 +3,8 @@ def makeLine(penguin, ball):
                         slope = (penguin.getRectangle().centery - ball.getRectangle().centery) / (penguin.getRectangle().centerx - ball.getRectangle().centerx)
 
                         lineEndPoint = (slope * (0 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
-                        lineStartPoint = (slope * (1000 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
-                        line = [[1000, lineStartPoint], [0, lineEndPoint]]
+                        lineStartPoint = (slope * (5000 - penguin.getRectangle().centerx)) + penguin.getRectangle().centery
+                        line = [[5000, lineStartPoint], [0, lineEndPoint]]
                     except:
                         if ball.getRectangle().centery > penguin.getRectangle().centery:
                             lineEndPoint = ball.getRectangle().centery + 1000

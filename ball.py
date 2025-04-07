@@ -6,7 +6,7 @@ class soccerBall:
         self.ymove = 0
         self.screen = screen
         self.rectangle = pygame.Rect(0, 0, constants.ballSize, constants.ballSize)
-        self.startingPoses = [100, 300, 500, constants.screenXSize - 500, constants.screenXSize - 300, constants.screenXSize - 100]
+        self.startingPoses = [300, 500, 600, constants.screenXSize - 600, constants.screenXSize - 500, constants.screenXSize - 300]
         self.rectangle.centerx = choice(self.startingPoses)
         self.rectangle.centery = constants.screenYSize / 2
 

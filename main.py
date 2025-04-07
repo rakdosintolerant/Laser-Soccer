@@ -327,7 +327,7 @@ while running:
     else:
 
         if keys[pygame.K_SPACE] and not spacePressed: #if space is being pressed (not held down)
-            if not click:
+            if not click and process[0] != "flinging":
                 nextStep()
             spacePressed = True
         else:
