@@ -8,6 +8,7 @@ class soccerNet:
             self.rightPost = pygame.Rect(constants.rightPostStartX, 0, constants.postWidth, constants.netHeight)
             self.backPost = pygame.Rect(constants.scoringAreaStartX, 0, constants.scoringAreaWidth, constants.backPostHeight)
             self.scoringArea = pygame.Rect(constants.scoringAreaStartX, 0, constants.scoringAreaWidth, constants.netHeight)
+            self.image = pygame.transform.scale(pygame.image.load("images/redNetFixed.png"), (constants.scoringAreaWidth + 50, constants.netHeight))
             self.right = True
         else:
             self.leftPost = pygame.Rect(constants.leftPostStartX, constants.screenYSize - constants.netHeight, constants.postWidth, constants.netHeight)
@@ -15,6 +16,8 @@ class soccerNet:
             self.backPost = pygame.Rect(constants.scoringAreaStartX, constants.screenYSize - constants.backPostHeight, constants.scoringAreaWidth, constants.backPostHeight)
             self.scoringArea = pygame.Rect(constants.scoringAreaStartX, constants.screenYSize - constants.netHeight, constants.scoringAreaWidth, constants.netHeight)
             self.right = False
+            self.image = pygame.transform.scale(pygame.image.load("images/blueNet.png"), (constants.scoringAreaWidth + 50, constants.screenYSize - constants.netHeight))
+
         self.speed = constants.netStartSpeed
         self.screen = screen
 
@@ -70,3 +73,4 @@ class soccerNet:
         pygame.draw.rect(self.screen, "white", self.rightPost)
         pygame.draw.rect(self.screen, "orange", self.scoringArea)
         pygame.draw.rect(self.screen, "white", self.backPost)
+        self.screen.blit(self.image, self.leftPost)
