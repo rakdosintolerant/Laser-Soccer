@@ -17,6 +17,10 @@ running = True
 click = False
 spacePressed = False
 process = ["titleScreen", False] #titleScreen, blueFling, redFling, or flinging
+wallImage = pygame.image.load("images/wallUpdateBig.png").convert()
+backgroundRect = pygame.Rect(constants.wallThickness, 00, 600, 400)
+backgroundImage = {"titleScreen" : pygame.transform.scale(pygame.image.load("images/flingBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize)), "flinging" : pygame.transform.scale(pygame.image.load("images/flingBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize)), "blueFling" : pygame.transform.scale(pygame.image.load("images/blueBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize)), "redFling" : pygame.transform.scale(pygame.image.load("images/redBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize))}
+
 
 redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
 blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
@@ -36,7 +40,9 @@ def resetPenguins(): #returns all penguins to starting position and manner
 
 def renderScreen():
     screen.fill(constants.backGroundColor[process[0]])
-    for wall in walls: pygame.draw.rect(screen, "white", wall)
+    screen.blit(wallImage, (0, 0))
+    screen.blit(backgroundImage[process[0]], (0, 0))
+    #for wall in walls: pygame.draw.rect(screen, "white", wall)
     for net in nets:
         net.render()
     for penguin in penguins:
@@ -75,6 +81,7 @@ def nextStep(): #this could be coded better if you want to fix it Noah
 
 def score(scored):
     global blueScore, redScore, redScoreText, blueScoreText
+    time.sleep(0.5)
     ball.reset()
     if scored == 0: blueScore += 1
     else: redScore += 1
