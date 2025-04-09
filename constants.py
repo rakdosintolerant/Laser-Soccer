@@ -10,6 +10,9 @@ screenXSize = 1400
 screenYSize = 800
 fps = 60
 
+scoreSize = 80
+font = "futura"
+
 #net constants
 postMass = 10
 netHeight = 100

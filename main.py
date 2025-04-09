@@ -21,19 +21,29 @@ wallImage = pygame.image.load("images/wallUpdateBig.png").convert()
 backgroundRect = pygame.Rect(constants.wallThickness, 00, 600, 400)
 backgroundImage = {"titleScreen" : pygame.transform.scale(pygame.image.load("images/flingBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize)), "flinging" : pygame.transform.scale(pygame.image.load("images/flingBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize)), "blueFling" : pygame.transform.scale(pygame.image.load("images/blueBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize)), "redFling" : pygame.transform.scale(pygame.image.load("images/redBackgroundWithWall.png").convert(), (constants.screenXSize, constants.screenYSize))}
 
-
-redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
-blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
-titleScreenText = pygame.font.Font(None, 200).render("Laser Soccer", True, "white")
-titleInstructionsText = pygame.font.Font(None, 50).render("Press Z for 1 player | Press X for 2 player | Press C for 0 player", True, "white")
-redScoreTextPos = redScoreText.get_rect(x=10, y=10)
-blueScoreTextPos = blueScoreText.get_rect(x=10, y=constants.screenYSize - 10 - 50)
+scoreBackdrops = (pygame.rect.Rect(0, 10, 60, 80), pygame.rect.Rect(0, constants.screenYSize - 90, 60, 80))
+redScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(redScore), True, "red")
+blueScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(blueScore), True, "blue")
+titleColor = 1
+titleScreenText = pygame.font.SysFont(constants.font, 240).render("Laser Soccer", True, "white")
+titleInstructionsText = pygame.font.SysFont(constants.font, 50).render("Press Z for 1 player | Press X for 2 player | Press C for 0 player", True, "grey")
+redScoreTextPos = redScoreText.get_rect(x=12, y=25)
+blueScoreTextPos = blueScoreText.get_rect(x=12, y=constants.screenYSize - 25 - 50)
 titleScreenTextPos = titleScreenText.get_rect(centerx=constants.screenXSize / 2, y=300)
 titleInstructionsTextPos = titleInstructionsText.get_rect(centerx=constants.screenXSize / 2, y = 500)
 isRedAi = True
 isBlueAi = False
 
 #functions
+def cycleTitleColor(color):
+    global titleScreenText
+    if color == 150: color, i = 0, 0
+    else: i = color//50
+    colors = ("green", "blue", "red")
+    newColor = colors[i]
+    titleScreenText = pygame.font.SysFont(constants.font, 240).render("Laser Soccer", True, newColor)
+    return color + 1
+
 def resetPenguins(): #returns all penguins to starting position and manner
     for penguin in penguins:
         penguin.reset()
@@ -42,6 +52,9 @@ def renderScreen():
     screen.fill(constants.backGroundColor[process[0]])
     screen.blit(wallImage, (0, 0))
     screen.blit(backgroundImage[process[0]], (0, 0))
+    for backdrop in scoreBackdrops: pygame.draw.rect(screen, "black", backdrop)
+    screen.blit(redScoreText, redScoreTextPos)
+    screen.blit(blueScoreText, blueScoreTextPos)
     #for wall in walls: pygame.draw.rect(screen, "white", wall)
     for net in nets:
         net.render()
@@ -50,8 +63,6 @@ def renderScreen():
             pygame.draw.line(screen, constants.lineColor, [penguin.getRectangle().centerx, penguin.getRectangle().centery], pygame.mouse.get_pos(), constants.activeLineWidth)
         penguin.render()
     ball.render()
-    screen.blit(redScoreText, redScoreTextPos)
-    screen.blit(blueScoreText, blueScoreTextPos)
     pygame.display.flip()
 
 
@@ -70,8 +81,8 @@ def nextStep(): #this could be coded better if you want to fix it Noah
         if blueScore >= 3 or redScore >= 3: 
             blueScore = 0
             redScore = 0
-            redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
-            blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
+            redScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(redScore), True, "red")
+            blueScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(blueScore), True, "blue")
             process = ["titleScreen", True]
         elif process[1]: process[0] = "blueFling"
         else: process[0] = "redFling"
@@ -81,12 +92,12 @@ def nextStep(): #this could be coded better if you want to fix it Noah
 
 def score(scored):
     global blueScore, redScore, redScoreText, blueScoreText
-    time.sleep(0.5)
+    pygame.time.wait(500)
     ball.reset()
     if scored == 0: blueScore += 1
     else: redScore += 1
-    redScoreText = pygame.font.Font(None, 50).render(str(redScore), True, "yellow")
-    blueScoreText = pygame.font.Font(None, 50).render(str(blueScore), True, "yellow")
+    redScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(redScore), True, "red")
+    blueScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(blueScore), True, "blue")
     for penguin in penguins: penguin.reset()
     for net in nets: net.reset()
     nextStep()
@@ -327,6 +338,8 @@ while running:
             isBlueAi = True
             isRedAi = True
             nextStep()
+        titleColor = cycleTitleColor(titleColor)
+        screen.blit(backgroundImage["titleScreen"], (0, 0))
         screen.blit(titleScreenText, titleScreenTextPos)
         screen.blit(titleInstructionsText, titleInstructionsTextPos)
         pygame.display.flip()
