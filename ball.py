@@ -43,5 +43,7 @@ class soccerBall:
 
     def render(self):
         import main
-        main.screen.blit(self.image, self.rectangle)
+        try:
+            main.screen.blit(self.image, self.rectangle)
+        except: main.screen.blit(self.images[0], self.rectangle)
         #pygame.draw.rect(self.screen, "white", self.rectangle)

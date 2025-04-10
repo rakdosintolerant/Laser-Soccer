@@ -9,6 +9,9 @@ from resolveCollisions import resolveNetCollision
 pygame.init()
 screen = pygame.display.set_mode((constants.screenXSize, constants.screenYSize))
 clock = pygame.time.Clock()
+pygame.mixer.music.load("sounds/themeSong.mp3")
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.2)
 
 #variables (should try to have as few of these possible, it's bad practice)
 redScore = 0
@@ -71,6 +74,9 @@ def nextStep(): #this could be coded better if you want to fix it Noah
     global process, redScore, blueScore, redScoreText, blueScoreText
     if process[0] == "titleScreen":
         process[0] = "blueFling"
+        tsSound = pygame.mixer.Sound("sounds/titleRead.mp3")
+        tsSound.play()
+        tsSound.set_volume(1)
     elif process[0] == "blueFling":
         if process[1]: process[0] = "flinging"
         else: process[0] = "redFling"
@@ -79,6 +85,14 @@ def nextStep(): #this could be coded better if you want to fix it Noah
         else: process[0] = "flinging"
     elif process[0] == "flinging": 
         if blueScore >= 3 or redScore >= 3: 
+            if blueScore >= 3: 
+                tsSound = pygame.mixer.Sound("sounds/blueWins.mp3")
+                tsSound.play()
+                tsSound.set_volume(1)
+            else: 
+                tsSound = pygame.mixer.Sound("sounds/redWins.mp3")
+                tsSound.play()
+                tsSound.set_volume(1)
             blueScore = 0
             redScore = 0
             redScoreText = pygame.font.SysFont(constants.font, constants.scoreSize, True).render(str(redScore), True, "red")
@@ -92,6 +106,9 @@ def nextStep(): #this could be coded better if you want to fix it Noah
 
 def score(scored):
     global blueScore, redScore, redScoreText, blueScoreText
+    tsSound = pygame.mixer.Sound("sounds/goal.mp3")
+    tsSound.play()
+    tsSound.set_volume(0.2)
     pygame.time.wait(500)
     ball.reset()
     if scored == 0: blueScore += 1

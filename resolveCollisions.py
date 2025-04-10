@@ -1,4 +1,4 @@
-import constants
+import constants, pygame
 def resolveCollision(peng1, peng2):
         rect1 = peng1.getRectangle()
         try:
@@ -10,6 +10,7 @@ def resolveCollision(peng1, peng2):
 
         if not rect1.colliderect(rect2):
             return
+        pygame.mixer.Sound("sounds/impact.mp3").play()
         # Calculate overlap in both axes
         overlap_x = min(rect1.right - rect2.left, rect2.right - rect1.left)
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
@@ -87,6 +88,8 @@ def resolveNetCollision(peng1, post1, postSpeed):
         rect2 = post1
 
         if not rect1.colliderect(rect2): return "noTurn"
+        pygame.mixer.Sound("sounds/impact.mp3").play()
+
         # Calculate overlap in both axes
         overlap_x = min(rect1.right - rect2.left, rect2.right - rect1.left)
         overlap_y = min(rect1.bottom - rect2.top, rect2.bottom - rect1.top)
